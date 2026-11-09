@@ -1,7 +1,9 @@
 "use client";
 
+import { useTranslation } from "@/components/LocaleProvider";
+
 import Photo from "@/components/site/Photo";
-import Link from "next/link";
+import { AppointmentLink } from "./AppointmentModal";
 import { useEffect, useRef, useState } from "react";
 import { conditions } from "@/lib/content";
 
@@ -11,6 +13,7 @@ import { conditions } from "@/lib/content";
  * Pe telefon sau cu „reduce motion” devine un carusel obișnuit.
  */
 export default function ConditionsGallery() {
+  const { t } = useTranslation();
   const sectionRef = useRef<HTMLElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const barRef = useRef<HTMLDivElement>(null);
@@ -80,14 +83,14 @@ export default function ConditionsGallery() {
       ref={sectionRef}
       className="relative bg-forest text-white"
       style={pinned && height ? { height } : undefined}
-      aria-label="Afecțiuni tratate"
+      aria-label={t("Afecțiuni tratate")}
     >
       <div className={pinned ? "sticky top-0 flex h-screen flex-col justify-center overflow-hidden" : "py-20"}>
         <div className="container-x mb-10 flex flex-col justify-between gap-6 pt-16 md:flex-row md:items-end">
           <div className="flex flex-col gap-2">
-            <h2 className="text-4xl text-white md:text-5xl">Afecțiuni tratate</h2>
+            <h2 className="text-4xl text-white md:text-5xl">{t("Afecțiuni tratate")}</h2>
             <p className="text-lg text-mist">
-              {pinned ? "Derulează ca să le vezi pe toate." : "Glisează ca să le vezi pe toate."}
+              {t(pinned ? "Derulează ca să le vezi pe toate." : "Glisează ca să le vezi pe toate.")}
             </p>
           </div>
           {pinned && (
@@ -118,25 +121,24 @@ export default function ConditionsGallery() {
                 }`}
               >
                 <div className="relative h-[55%] w-full bg-nav">
-                  <Photo src={c.image} alt={c.name} sizes="(min-width: 768px) 520px, 85vw" className="object-cover" />
+                  <Photo src={c.image} alt={t(c.imageAlt)} sizes="(min-width: 768px) 520px, 85vw" className={`object-cover ${c.imageClassName ?? ""}`} />
                 </div>
                 <div className="flex flex-1 flex-col justify-between p-6">
                   <div className="flex flex-col gap-2">
-                    <h3 className="text-2xl leading-tight text-white md:text-3xl">{c.name}</h3>
-                    <p className="text-white/80">{c.short}</p>
-                    <p className="font-medium text-mist">Tratament: {c.treatment}</p>
+                    <h3 className="text-2xl leading-tight text-white md:text-3xl">{t(c.name)}</h3>
+                    <p className="text-white/80">{t(c.short)}</p>
+                    <p className="font-medium text-mist">{t("Tratament:")}{" "}{t(c.treatment)}</p>
                   </div>
                   <div className="flex flex-wrap items-center justify-between gap-3 border-t border-mist/15 pt-3">
                     <div className="flex flex-wrap gap-2">
                       {c.places.map((p) => (
                         <span key={p} className="rounded-full border border-mist/40 px-2.5 py-0.5 text-xs text-mist">
-                          {p}
+                          {t(p)}
                         </span>
                       ))}
                     </div>
-                    <Link href="/contact" className="text-sm font-semibold text-mist hover:underline">
-                      Programează-te →
-                    </Link>
+                    <AppointmentLink href="/contact" className="text-sm font-semibold text-mist hover:underline">
+                      {t("Programează-te →")}</AppointmentLink>
                   </div>
                 </div>
               </article>

@@ -1,6 +1,8 @@
 "use client";
 
-import Link from "next/link";
+import { useTranslation } from "@/components/LocaleProvider";
+
+import { AppointmentLink } from "./AppointmentModal";
 import { useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { serviceGroups, services, type ServiceGroup } from "@/lib/content";
@@ -13,6 +15,7 @@ const groupTile: Record<ServiceGroup, string> = {
 
 /** Serviciile afișate ca un tabel periodic. Click pe o plăcuță schimbă plăcuța mare. */
 export default function ServicesTable() {
+  const { t } = useTranslation();
   const [selected, setSelected] = useState(3);
   const s = services[selected];
 
@@ -26,30 +29,29 @@ export default function ServicesTable() {
         >
           <div>
             <div className="flex items-start justify-between">
-              <span className="text-sm font-bold text-secondary">{s.num}</span>
+              <span className="text-sm font-bold text-secondary">{t(s.num)}</span>
               <span className="rounded-full bg-secondary-container px-2.5 py-0.5 text-xs font-semibold text-primary">
-                {serviceGroups[s.group]}
+                {t(serviceGroups[s.group])}
               </span>
             </div>
             <div className="my-4 text-center font-heading text-[96px] leading-none text-primary md:text-[120px]">
-              {s.symbol}
+              {t(s.symbol)}
             </div>
-            <h3 className="mb-2 font-sans text-2xl font-medium text-primary">{s.name}</h3>
+            <h3 className="mb-2 font-sans text-2xl font-medium text-primary">{t(s.name)}</h3>
             <div className="flex flex-col gap-1 text-[17px] leading-relaxed text-on-surface-variant">
-              <p>{s.description}</p>
+              <p>{t(s.description)}</p>
               <p className="mt-1 text-on-surface">
-                <strong>Pentru:</strong> {s.forWhat}.
+                <strong>{t("Pentru:")}</strong> {t(s.forWhat)}.
               </p>
               <p className="text-on-surface">
-                <strong>Unde:</strong> {s.where}.
+                <strong>{t("Unde:")}</strong> {t(s.where)}.
               </p>
             </div>
           </div>
           <div className="mt-6 border-t border-outline-variant/40 pt-4">
-            <Link href="/contact" className="group inline-flex items-center gap-1 font-semibold text-primary">
-              Programează o consultație
-              <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
-            </Link>
+            <AppointmentLink href="/contact" className="group inline-flex items-center gap-1 font-semibold text-primary">
+              {t("Programează o consultație")}<ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
+            </AppointmentLink>
           </div>
         </div>
       </div>
@@ -72,7 +74,7 @@ export default function ServicesTable() {
                 }`}
               >
                 <span className="flex items-center justify-between text-[10px] font-bold text-secondary">
-                  {item.num}
+                  {t(item.num)}
                   {active && <span className="h-1.5 w-1.5 rounded-full bg-primary" />}
                 </span>
                 <span
@@ -80,14 +82,14 @@ export default function ServicesTable() {
                     active ? "font-semibold" : ""
                   }`}
                 >
-                  {item.symbol}
+                  {t(item.symbol)}
                 </span>
                 <span
                   className={`text-center text-[11px] leading-tight md:text-[13px] ${
                     active ? "font-semibold text-primary" : "font-medium text-on-surface-variant"
                   }`}
                 >
-                  {item.name}
+                  {t(item.name)}
                 </span>
               </button>
             );
@@ -97,7 +99,7 @@ export default function ServicesTable() {
           {(Object.keys(serviceGroups) as ServiceGroup[]).map((g) => (
             <span key={g} className="flex items-center gap-2 text-sm text-on-surface-variant">
               <span className={`h-3.5 w-3.5 rounded-sm border border-outline-variant/50 ${groupTile[g]}`} />
-              {serviceGroups[g]}
+              {t(serviceGroups[g])}
             </span>
           ))}
         </div>

@@ -1,8 +1,10 @@
+import { LocaleProvider } from "@/components/LocaleProvider";
 import type { Metadata } from "next";
 import { Newsreader, Plus_Jakarta_Sans } from "next/font/google";
 import { notFound } from "next/navigation";
 import { common, hasLocale, locales, ogLocale } from "@/lib/i18n";
 import { site } from "@/lib/site";
+import { AppointmentProvider } from "@/components/site/AppointmentModal";
 import "../globals.css";
 
 const jakarta = Plus_Jakarta_Sans({
@@ -57,7 +59,7 @@ export default async function RootLayout({ children, params }: LayoutProps<"/[la
           {t.skip}
         </a>
         <main id="continut" className="w-full flex-1">
-          {children}
+          <LocaleProvider lang={lang}><AppointmentProvider>{children}</AppointmentProvider></LocaleProvider>
         </main>
       </body>
     </html>

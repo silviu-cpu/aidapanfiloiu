@@ -7,6 +7,8 @@ export const hasLocale = (value: string): value is Locale =>
 
 /** Româna nu are prefix în URL (/despre), engleza are (/en/despre). */
 export function localePath(lang: Locale, path: string) {
+  if (!path.startsWith("/")) return path;
+  path = path.replace(/^\/(?:en|ro)(?=\/|$)/, "") || "/";
   if (lang === defaultLocale) return path;
   return path === "/" ? "/en" : `/en${path}`;
 }

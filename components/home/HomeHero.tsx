@@ -6,6 +6,7 @@ import Lenis from "lenis";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
+import { AppointmentLink } from "@/components/site/AppointmentModal";
 import { useEffect, useRef, useState } from "react";
 import { Loader } from "./Loader";
 import type { HeroStore } from "./scene/utils";
@@ -13,7 +14,6 @@ import type { HeroStore } from "./scene/utils";
 const HeroCanvas = dynamic(() => import("./scene/HeroCanvas"), { ssr: false });
 
 export type HeroCopy = {
-  eyebrow: string;
   titleA: string;
   titleB: string;
   lead: string;
@@ -66,7 +66,7 @@ export function HomeHero({
   useEffect(() => {
     if (!loaded || reduced) return;
     const ctx = gsap.context(() => {
-      gsap.from("[data-hero-s1] > div > *", {
+      gsap.from("[data-hero-s1] > div > :not([data-specialties])", {
         y: 28,
         autoAlpha: 0,
         duration: 1,
@@ -74,6 +74,17 @@ export function HomeHero({
         stagger: 0.08,
         delay: 0.25,
         clearProps: "transform,opacity,visibility",
+      });
+      const specialties = gsap.timeline({ delay: 0.6 });
+      trackRef.current?.querySelectorAll("[data-specialty]").forEach((specialty) => {
+        specialties.from(specialty.querySelectorAll("[data-letter]"), {
+          yPercent: 110,
+          autoAlpha: 0,
+          duration: 0.45,
+          stagger: 0.035,
+          ease: "power3.out",
+          clearProps: "transform,opacity,visibility",
+        });
       });
     }, trackRef);
     return () => ctx.revert();
@@ -182,36 +193,42 @@ export function HomeHero({
             className="pointer-events-none relative z-10 mx-auto flex h-full max-w-7xl flex-col justify-end px-5 pb-20 sm:px-8 md:justify-center md:pb-0"
           >
             <div className="pointer-events-auto max-w-2xl">
-              <p className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-white/85 backdrop-blur-md">
-                <span className="size-1.5 rounded-full bg-[#8fe6ea]" />
-                {copy.eyebrow}
-              </p>
-              <h1 id="hero-title" className="mt-5 text-4xl font-bold leading-[1.05] tracking-tight sm:text-5xl lg:text-[3.5rem]">
+              <h1 id="hero-title" className="text-4xl font-bold leading-[1.05] tracking-tight sm:text-5xl lg:text-[3.5rem]">
                 {copy.titleA}
                 <span className="block font-semibold text-[#a9dcd9]">{copy.titleB}</span>
               </h1>
               <p className="mt-5 max-w-md text-base leading-relaxed text-white/75">{copy.lead}</p>
 
-              {/* Specialitățile: linkuri discrete, cu o liniuță mentă care se lungește la hover */}
-              <ul className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-3 text-sm font-medium text-white/85">
+              {/* Specialitățile se dezvăluie pe rând, literă cu literă. */}
+              <ul data-specialties className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-3 text-sm font-medium text-white/85">
                 {copy.pills.map((label, i) => (
                   <li key={label} className="flex items-center gap-5">
                     {i > 0 && <span aria-hidden="true" className="hidden h-4 w-px bg-white/20 sm:block" />}
-                    <Link href={conditionsHref} className="group inline-flex items-center gap-2.5 transition-colors hover:text-white">
-                      <span aria-hidden="true" className="h-px w-4 bg-[#8fe6ea] transition-all duration-300 group-hover:w-7" />
-                      {label}
+                    <Link
+                      data-specialty
+                      href={conditionsHref}
+                      aria-label={label}
+                      className="inline-block whitespace-nowrap transition-colors hover:text-white"
+                    >
+                      <span aria-hidden="true" className="inline-block overflow-hidden align-bottom">
+                        {Array.from(label).map((letter, index) => (
+                          <span key={index} data-letter className="inline-block whitespace-pre">
+                            {letter}
+                          </span>
+                        ))}
+                      </span>
                     </Link>
                   </li>
                 ))}
               </ul>
 
               <div className="mt-8 flex flex-wrap gap-3">
-                <Link
+                <AppointmentLink
                   href={contactHref}
                   className="rounded-full bg-white px-6 py-3 text-sm font-semibold text-ink shadow-lg shadow-black/20 transition-transform hover:-translate-y-0.5"
                 >
                   {copy.ctaPrimary}
-                </Link>
+                </AppointmentLink>
                 <Link
                   href={conditionsHref}
                   className="rounded-full border border-white/20 bg-white/10 px-6 py-3 text-sm font-semibold text-white backdrop-blur-md transition-colors hover:bg-white/20"

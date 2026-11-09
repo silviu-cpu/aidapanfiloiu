@@ -8,7 +8,6 @@ import { site } from "@/lib/site";
 
 const hero: Record<Locale, HeroCopy> = {
   ro: {
-    eyebrow: "Cabinet chirurgical București",
     titleA: "Chirurgie generală.",
     titleB: "Cu atenție pentru tine.",
     lead: "Consultații de chirurgie generală și proctologie în București. Evaluare atentă, diagnostic de precizie și explicații clare despre toate opțiunile tale de tratament.",
@@ -25,7 +24,6 @@ const hero: Record<Locale, HeroCopy> = {
     loading: "Se încarcă pagina",
   },
   en: {
-    eyebrow: "Surgical practice in Bucharest",
     titleA: "General surgery.",
     titleB: "With care for you.",
     lead: "General surgery and proctology consultations in Bucharest. Careful assessment, precise diagnosis and clear explanations of all your treatment options.",
@@ -64,9 +62,9 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
       />
 
       <div className="site-page">
-        <HomeSections />
+        <HomeSections lang={lang} />
       </div>
-      <Footer />
+      <Footer lang={lang} />
     </>
   );
 }

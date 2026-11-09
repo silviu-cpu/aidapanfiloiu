@@ -1,7 +1,8 @@
+import { translator } from "@/lib/translate";
 import type { Metadata } from "next";
 import { SiteHeader } from "@/components/SiteHeader";
 import Footer from "@/components/site/Footer";
-import { alternates, getLang } from "@/lib/i18n";
+import { alternates, getLang, localePath, type Locale } from "@/lib/i18n";
 import Photo from "@/components/site/Photo";
 import { Info } from "lucide-react";
 import CallbackForm from "@/components/site/CallbackForm";
@@ -47,16 +48,17 @@ const faq = [
 
 export async function generateMetadata({ params }: PageProps<"/[lang]/contact">): Promise<Metadata> {
   const lang = await getLang(params);
+  const t = translator(lang);
   return {
-    title: "Contact",
-    description:
-      "Programări la Dr. Aida Gabriela Panfiloiu: Clinica Victoria, MedLife Titan și Grivița, Royal Hospital și Clinica Dr. Plagă, București.",
+    title: t("Contact"),
+    description: t("Programări la Dr. Aida Gabriela Panfiloiu: Clinica Victoria, MedLife Titan și Grivița, Royal Hospital și Clinica Dr. Plagă, București."),
     alternates: alternates(lang, "/contact"),
   };
 }
 
 export default async function ContactPage({ params }: PageProps<"/[lang]/contact">) {
   const lang = await getLang(params);
+  const t = translator(lang);
   return (
     <>
       <SiteHeader lang={lang} current="/contact" />
@@ -65,10 +67,9 @@ export default async function ContactPage({ params }: PageProps<"/[lang]/contact
       <section className={`${heroSectionClass} px-6 pb-24 pt-36 md:pt-40`}>
         <HeroBackdrop />
         <div className="relative mx-auto flex max-w-6xl flex-col items-center">
-          <h1 className="mb-3 max-w-3xl text-center text-5xl text-white md:text-6xl">Cu ce te pot ajuta?</h1>
+          <h1 className="mb-3 max-w-3xl text-center text-5xl text-white md:text-6xl">{t("Cu ce te pot ajuta?")}</h1>
           <p className="mb-10 max-w-xl text-center text-lg text-secondary-fixed">
-            Alege ce te deranjează și îți arăt unde te poți programa.
-          </p>
+            {t("Alege ce te deranjează și îți arăt unde te poți programa.")}</p>
           <Triage />
         </div>
       </section>
@@ -77,18 +78,17 @@ export default async function ContactPage({ params }: PageProps<"/[lang]/contact
       <section className="bg-surface-lowest py-16 md:py-20">
         <div className="container-x">
           <div className="mb-10">
-            <SectionTitle title="Unde mă găsești" />
+            <SectionTitle title={t("Unde mă găsești")} />
           </div>
           <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-12">
             <div className="flex flex-col rounded-[2rem] bg-surface-low p-6 lg:col-span-6">
               <div className="flex items-center justify-between pb-4">
-                <span className="text-sm font-semibold text-secondary">Locațiile mele în București</span>
+                <span className="text-sm font-semibold text-secondary">{t("Locațiile mele în București")}</span>
                 <span className="rounded-full bg-surface-mid px-2.5 py-0.5 text-xs text-on-surface-variant">
-                  {locations.length} locații
-                </span>
+                  {locations.length} {t("locații")}</span>
               </div>
               <div className="aspect-[4/3] w-full rounded-2xl bg-surface-lowest/80 p-2 shadow-inner">
-                <svg viewBox="0 0 460 340" className="h-full w-full" role="img" aria-label="Hartă schematică a locațiilor">
+                <svg viewBox="0 0 460 340" className="h-full w-full" role="img" aria-label={t("Hartă schematică a locațiilor")}>
                   <path d="M 10 70 Q 120 85 240 60 T 450 50" stroke="#d1e7de" strokeWidth="6" strokeLinecap="round" fill="none" />
                   <path d="M 20 280 Q 180 230 250 170 T 440 140" stroke="#d1e7de" strokeWidth="7" strokeLinecap="round" fill="none" />
                   <circle cx="230" cy="170" r="110" stroke="#e1e3e2" strokeDasharray="3 3" strokeWidth="1.5" fill="none" />
@@ -108,13 +108,13 @@ export default async function ContactPage({ params }: PageProps<"/[lang]/contact
                         fill="#124e51"
                         fontFamily="var(--font-jakarta), sans-serif"
                       >
-                        {p.label}
+                        {t(p.label)}
                       </text>
                     </g>
                   ))}
                 </svg>
               </div>
-              <p className="mt-3 text-xs text-on-surface-variant">Hartă schematică, nu la scară.</p>
+              <p className="mt-3 text-xs text-on-surface-variant">{t("Hartă schematică, nu la scară.")}</p>
             </div>
 
             <div className="flex flex-col lg:col-span-6">
@@ -124,10 +124,10 @@ export default async function ContactPage({ params }: PageProps<"/[lang]/contact
                     <span className="mt-2 h-2.5 w-2.5 shrink-0 rounded-full bg-primary" />
                     <div>
                       <div className="flex flex-wrap items-center gap-2">
-                        <h3 className="font-sans text-lg font-semibold text-on-surface">{l.name}</h3>
-                        <span className="rounded-full bg-secondary-container px-2 py-0.5 text-xs text-secondary">{l.area}</span>
+                        <h3 className="font-sans text-lg font-semibold text-on-surface">{t(l.name)}</h3>
+                        <span className="rounded-full bg-secondary-container px-2 py-0.5 text-xs text-secondary">{t(l.area)}</span>
                       </div>
-                      <p className="mt-1 text-on-surface-variant">{l.services}</p>
+                      <p className="mt-1 text-on-surface-variant">{t(l.services)}</p>
                       {/* TODO: programul pentru fiecare locație. */}
                     </div>
                   </li>
@@ -135,7 +135,7 @@ export default async function ContactPage({ params }: PageProps<"/[lang]/contact
               </ul>
               <div className="mt-6 flex items-center gap-3 rounded-2xl bg-secondary-container/40 p-4">
                 <Info className="shrink-0 text-primary" size={20} />
-                <p className="font-semibold text-primary">{surgeryNote}</p>
+                <p className="font-semibold text-primary">{t(surgeryNote)}</p>
               </div>
             </div>
           </div>
@@ -145,22 +145,22 @@ export default async function ContactPage({ params }: PageProps<"/[lang]/contact
       {/* CANALE DIRECTE */}
       <section className="bg-mist-bg px-6 py-16 md:py-20">
         <div className="mx-auto flex max-w-5xl flex-col items-center">
-          <h2 className="mb-10 text-center text-4xl text-primary">Contact direct</h2>
+          <h2 className="mb-10 text-center text-4xl text-primary">{t("Contact direct")}</h2>
           <div className="grid w-full grid-cols-1 divide-y divide-outline-variant/40 md:grid-cols-3 md:divide-x md:divide-y-0">
             {channels.map((c) => (
               <div key={c.label} className="flex flex-col items-center px-4 py-5 text-center md:py-0">
-                <span className="mb-2 text-lg font-semibold text-primary">{c.label}</span>
+                <span className="mb-2 text-lg font-semibold text-primary">{t(c.label)}</span>
                 <a
                   href={c.href}
                   className="text-on-surface transition-colors hover:text-primary"
                   {...(c.href.startsWith("http") ? { target: "_blank", rel: "noopener noreferrer" } : {})}
                 >
-                  {c.value}
+                  {t(c.value)}
                 </a>
               </div>
             ))}
           </div>
-          <p className="pt-8 text-center text-secondary">{contact.languages}</p>
+          <p className="pt-8 text-center text-secondary">{t(contact.languages)}</p>
         </div>
       </section>
 
@@ -169,11 +169,11 @@ export default async function ContactPage({ params }: PageProps<"/[lang]/contact
         <div className="container-x grid grid-cols-1 items-center gap-10 lg:grid-cols-12">
           <div className="flex flex-col gap-6 lg:col-span-5">
             <SectionTitle
-              title="Vrei să te sun eu?"
-              intro="Lasă-mi numele și numărul de telefon, te sun pentru a stabili programarea."
+              title={t("Vrei să te sun eu?")}
+              intro={t("Lasă-mi numele și numărul de telefon, te sun pentru a stabili programarea.")}
             />
             <div className="relative h-56 overflow-hidden rounded-[2rem] bg-primary-container shadow-md">
-              <Photo src={images.scalpel} alt="Instrumente chirurgicale de precizie" sizes="(min-width: 1024px) 40vw, 100vw" className="object-cover" />
+              <Photo src={images.consultation} alt={t("Discuție despre documentele medicale în timpul consultației")} sizes="(min-width: 1024px) 40vw, 100vw" className="object-cover" />
               <div className="absolute inset-0 bg-gradient-to-t from-primary/70 via-transparent to-transparent" />
             </div>
           </div>
@@ -186,7 +186,7 @@ export default async function ContactPage({ params }: PageProps<"/[lang]/contact
       {/* FAQ */}
       <section className="bg-gradient-to-b from-mist-bg via-secondary-container to-primary px-6 pb-28 pt-16 md:pb-32 md:pt-20">
         <div className="mx-auto max-w-4xl">
-          <h2 className="mb-10 text-center text-4xl text-primary md:text-5xl">Întrebări frecvente</h2>
+          <h2 className="mb-10 text-center text-4xl text-primary md:text-5xl">{t("Întrebări frecvente")}</h2>
           <Faq items={faq} />
         </div>
       </section>
@@ -199,15 +199,15 @@ export default async function ContactPage({ params }: PageProps<"/[lang]/contact
             <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-red-500" />
           </span>
           <span className="text-[15px] font-semibold">
-            Pentru urgențe medicale sună la <a href="tel:112" className="underline">112</a>.
+            {t("Pentru urgențe medicale sună la")}{" "}<a href="tel:112" className="underline">112</a>.
           </span>
         </div>
       </section>
       <section className="bg-surface-mid px-6 py-4">
-        <p className="text-center text-xs text-on-surface-variant">{disclaimer}</p>
+        <p className="text-center text-xs text-on-surface-variant">{t(disclaimer)}</p>
       </section>
       </div>
-      <Footer />
+      <Footer lang={lang} />
     </>
   );
 }

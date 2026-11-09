@@ -30,20 +30,17 @@ export const nav = [
   { href: "/contact", label: "Contact" },
 ] as const;
 
-// Imagini: exportă-le din Google Stitch și pune-le în /public/images cu numele de mai jos.
-// Imaginile site-ului, în /public/images (exportate din Google Stitch + fotografia doamnei doctor).
+// Fotografii reale ale doamnei doctor + imagini de context. Surse: docs/image-sources.md.
 export const images = {
   doctor: "/images/dr-aida-panfiloiu.webp",
   // Fotografia din CV (250 × 250 px). TODO: varianta originală, la rezoluție mai mare.
   doctorCv: "/images/dr-aida-panfiloiu-cv.png",
-  laparoscopic: "/images/laparoscopic.jpg",
-  laparoscopicDevices: "/images/instrument-tray.jpg",
-  scalpel: "/images/forceps.jpg",
-  suture: "/images/suture.jpg",
-  consultationRoom: "/images/consultation-room.jpg",
-  conditionHernia: "/images/laparoscopic.jpg",
-  conditionGallbladder: "/images/instrument-tray.jpg",
-  conditionHemorrhoids: "/images/consultation-room.jpg",
+  consultation: "/images/consultation.webp",
+  operatingRoom: "/images/operating-room.webp",
+  ultrasound: "/images/ultrasound.webp",
+  patientSupport: "/images/patient-support.webp",
+  medicalResearch: "/images/medical-research.webp",
+  woundCare: "/images/wound-care.webp",
 };
 
 export type Location = {
@@ -107,6 +104,8 @@ export type Condition = {
   treatment: string;
   places: string[];
   image: string;
+  imageAlt: string;
+  imageClassName?: string;
 };
 
 // TODO: textele medicale trebuie aprobate de doamna doctor.
@@ -117,7 +116,8 @@ export const conditions: Condition[] = [
     short: "Umflătură în zona inghinală sau la ombilic, care apare mai ales la efort.",
     treatment: "De regulă intervenție laparoscopică, cu plasă de întărire.",
     places: ["Clinica Victoria", "MedLife", "Royal Hospital"],
-    image: images.conditionHernia,
+    image: images.ultrasound,
+    imageAlt: "Ecograf pregătit pentru examinare într-un cabinet luminos",
   },
   {
     id: "colecist",
@@ -125,7 +125,8 @@ export const conditions: Condition[] = [
     short: "Calculi în vezica biliară, care pot provoca dureri și inflamație.",
     treatment: "Colecistectomie laparoscopică.",
     places: ["Clinica Victoria", "MedLife", "Royal Hospital"],
-    image: images.conditionGallbladder,
+    image: images.operatingRoom,
+    imageAlt: "Sală de operație luminoasă, pregătită înaintea unei intervenții",
   },
   {
     id: "hemoroizi",
@@ -133,7 +134,8 @@ export const conditions: Condition[] = [
     short: "Sângerare la scaun, disconfort sau mâncărime în zona anală.",
     treatment: "De la tratament conservator la intervenție, în funcție de stadiu.",
     places: ["MedLife Titan", "MedLife Grivița", "Royal Hospital"],
-    image: images.conditionHemorrhoids,
+    image: images.consultation,
+    imageAlt: "Discuție despre documentele medicale în timpul consultației",
   },
   {
     id: "fisuri",
@@ -141,7 +143,9 @@ export const conditions: Condition[] = [
     short: "O mică ruptură a mucoasei anale, cu durere intensă la scaun.",
     treatment: "Inițial tratament conservator, intervenție dacă fisura nu se vindecă.",
     places: ["MedLife Titan", "MedLife Grivița", "Royal Hospital"],
-    image: images.scalpel,
+    image: images.patientSupport,
+    imageAlt: "Gest de sprijin și grijă față de pacient",
+    imageClassName: "object-bottom",
   },
   {
     id: "fistule",
@@ -149,7 +153,8 @@ export const conditions: Condition[] = [
     short: "Traiecte anormale sub piele, apărute de obicei după o infecție sau un abces.",
     treatment: "Intervenție chirurgicală adaptată fiecărui caz.",
     places: ["MedLife Titan", "MedLife Grivița", "Royal Hospital"],
-    image: images.laparoscopicDevices,
+    image: images.medicalResearch,
+    imageAlt: "Studierea informațiilor medicale la birou",
   },
   {
     id: "plagi",
@@ -157,7 +162,8 @@ export const conditions: Condition[] = [
     short: "Plăgi acute, postoperatorii sau greu vindecabile.",
     treatment: "Curățare, pansamente moderne și monitorizare până la vindecare.",
     places: ["Clinica Dr. Plagă"],
-    image: images.suture,
+    image: images.woundCare,
+    imageAlt: "Aplicarea atentă a unui bandaj pe mână, fără rană vizibilă",
   },
 ];
 
