@@ -229,7 +229,7 @@ export function Scene({ store }: { store: RefObject<HeroStore> }) {
         <Grasper rig={rig} />
       </group>
 
-      <Tray portrait={portrait} anchorRef={anchor} glowRef={glow} />
+      <Tray portrait={portrait} anchorRef={anchor} glowRef={glow} store={store} />
     </>
   );
 }
