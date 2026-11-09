@@ -4,6 +4,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Lenis from "lenis";
 import dynamic from "next/dynamic";
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { Loader } from "./Loader";
@@ -20,6 +21,9 @@ export type HeroCopy = {
   ctaSecondary: string;
   doctorName: string;
   doctorNote: string;
+  /** Fotografia doamnei doctor, afișată mic lângă nume. */
+  doctorPhoto: string;
+  /** Specialitățile, afișate sub descriere (și în loader). */
   pills: [string, string, string];
   scroll: string;
   s2Eyebrow: string;
@@ -27,13 +31,6 @@ export type HeroCopy = {
   s2Text: string;
   loading: string;
 };
-
-/** Unde stau etichetele în jurul pensei (desktop) și încotro pleacă la scroll. */
-const PILLS = [
-  { className: "left-[72%] top-[24%]", away: { x: 120, y: -90 } },
-  { className: "left-[80%] top-[60%]", away: { x: 160, y: 60 } },
-  { className: "left-[54%] top-[66%]", away: { x: -60, y: 120 } },
-];
 
 export function HomeHero({
   copy,
@@ -142,9 +139,6 @@ export function HomeHero({
 
       tl.to("[data-hero-hint]", { autoAlpha: 0, duration: 0.04 }, 0)
         .to("[data-hero-s1]", { autoAlpha: 0, y: -70, duration: 0.14 }, 0.03);
-      PILLS.forEach((pill, i) => {
-        tl.to(`[data-hero-pill="${i}"]`, { autoAlpha: 0, ...pill.away, scale: 0.85, duration: 0.12 }, 0.02 + i * 0.015);
-      });
       tl.fromTo("[data-hero-s2]", { autoAlpha: 0, y: 40 }, { autoAlpha: 1, y: 0, duration: 0.1 }, 0.8)
         // Ține cronologia exact pe 0..1, ca să se potrivească cu scena 3D.
         .to({}, { duration: 0 }, 1);
@@ -198,6 +192,19 @@ export function HomeHero({
               </h1>
               <p className="mt-5 max-w-md text-base leading-relaxed text-white/75">{copy.lead}</p>
 
+              {/* Specialitățile: linkuri discrete, cu o liniuță mentă care se lungește la hover */}
+              <ul className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-3 text-sm font-medium text-white/85">
+                {copy.pills.map((label, i) => (
+                  <li key={label} className="flex items-center gap-5">
+                    {i > 0 && <span aria-hidden="true" className="hidden h-4 w-px bg-white/20 sm:block" />}
+                    <Link href={conditionsHref} className="group inline-flex items-center gap-2.5 transition-colors hover:text-white">
+                      <span aria-hidden="true" className="h-px w-4 bg-[#8fe6ea] transition-all duration-300 group-hover:w-7" />
+                      {label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+
               <div className="mt-8 flex flex-wrap gap-3">
                 <Link
                   href={contactHref}
@@ -213,32 +220,27 @@ export function HomeHero({
                 </Link>
               </div>
 
-              <div className="mt-8 hidden w-fit items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.07] py-2.5 pl-2.5 pr-5 backdrop-blur-md sm:flex">
-                <span className="grid size-9 place-items-center rounded-full bg-white/10">
-                  <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
-                    <path d="M12 3l7 3v5c0 4.5-3 8.3-7 10-4-1.7-7-5.5-7-10V6l7-3z" />
-                    <path d="M9 12l2 2 4-4" />
-                  </svg>
+              {/* Semnătura: fotografia reală, numele și experiența, fără cutie */}
+              <div className="mt-10 hidden max-w-md items-center gap-5 border-t border-white/10 pt-6 sm:flex">
+                {/* Cerc cu un inel fin mentă; poza e mărită pe față, ca un portret. */}
+                <span className="shrink-0 rounded-full border border-[#8fe6ea]/40 p-1 shadow-lg shadow-black/25">
+                  <span className="relative block size-20 overflow-hidden rounded-full bg-white">
+                    <Image
+                      src={copy.doctorPhoto}
+                      alt=""
+                      width={160}
+                      height={160}
+                      className="size-full origin-[50%_18%] scale-[1.55] object-cover object-[50%_12%]"
+                    />
+                  </span>
                 </span>
                 <span>
-                  <span className="block text-sm font-semibold">{copy.doctorName}</span>
-                  <span className="block text-xs text-white/60">{copy.doctorNote}</span>
+                  <span className="block font-serif text-2xl leading-tight text-white">{copy.doctorName}</span>
+                  <span className="mt-1 block text-sm text-white/60">{copy.doctorNote}</span>
                 </span>
               </div>
             </div>
           </div>
-
-          {/* Etichetele care plutesc în jurul pensei */}
-          {copy.pills.map((label, i) => (
-            <span
-              key={label}
-              data-hero-pill={i}
-              className={`absolute z-10 hidden -translate-x-1/2 items-center gap-2 rounded-full border border-white/40 bg-white/85 px-3.5 py-1.5 text-xs font-semibold text-ink shadow-lg shadow-black/15 backdrop-blur-md md:inline-flex ${PILLS[i].className}`}
-            >
-              <span className="grid size-4 place-items-center rounded-full bg-ink text-[9px] text-white">+</span>
-              {label}
-            </span>
-          ))}
 
           {/* Scena 2: textul de deasupra tăvii */}
           {!reduced && (

@@ -14,12 +14,15 @@ export default function Photo({
   sizes,
   className = "",
   preload = false,
+  unoptimized = false,
 }: {
   src: string;
   alt: string;
   sizes: string;
   className?: string;
   preload?: boolean;
+  /** Servește fișierul original, fără recomprimare (pentru imagini mici, ca să nu-și piardă claritatea). */
+  unoptimized?: boolean;
 }) {
   const [failed, setFailed] = useState(false);
 
@@ -42,6 +45,7 @@ export default function Photo({
       fill
       sizes={sizes}
       preload={preload}
+      unoptimized={unoptimized}
       className={className}
       onError={() => setFailed(true)}
     />

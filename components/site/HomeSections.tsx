@@ -163,13 +163,17 @@ export default function HomeSections() {
       {/* DESPRE */}
       <section className="bg-surface-lowest py-16 md:py-20">
         <div className="container-x grid grid-cols-1 items-center gap-10 lg:grid-cols-12">
-          <div className="relative mx-auto aspect-[4/5] w-full max-w-sm overflow-hidden rounded-[2rem] bg-surface-low shadow-xl lg:col-span-4">
-            <Photo
-              src={images.doctor}
-              alt={`${doctor.name}, ${doctor.title}`}
-              sizes="(min-width: 1024px) 380px, 90vw"
-              className="object-cover object-top"
-            />
+          {/* Fotografia doamnei doctor (520 × 520 px), servită fără recomprimare ca să rămână clară. */}
+          <div className="flex justify-center lg:col-span-4">
+            <div className="relative aspect-[4/5] w-full max-w-[380px] overflow-hidden rounded-[2rem] bg-surface-low shadow-xl">
+              <Photo
+                src={images.doctor}
+                alt={`${doctor.name}, ${doctor.title}`}
+                sizes="380px"
+                unoptimized
+                className="object-cover object-top"
+              />
+            </div>
           </div>
           <div className="flex flex-col gap-8 lg:col-span-8">
             <h2 className="text-3xl leading-tight text-on-surface md:text-[44px]">

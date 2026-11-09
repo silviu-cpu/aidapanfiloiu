@@ -34,6 +34,8 @@ export const nav = [
 // Imaginile site-ului, în /public/images (exportate din Google Stitch + fotografia doamnei doctor).
 export const images = {
   doctor: "/images/dr-aida-panfiloiu.webp",
+  // Fotografia din CV (250 × 250 px). TODO: varianta originală, la rezoluție mai mare.
+  doctorCv: "/images/dr-aida-panfiloiu-cv.png",
   laparoscopic: "/images/laparoscopic.jpg",
   laparoscopicDevices: "/images/instrument-tray.jpg",
   scalpel: "/images/forceps.jpg",
