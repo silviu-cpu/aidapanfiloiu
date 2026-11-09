@@ -45,14 +45,14 @@ export const common = {
   },
 } satisfies Record<Locale, Record<string, string>>;
 
-/** Meniul principal. Paginile din afară de Acasă urmează să fie create. */
+/** Meniul principal. */
 export const nav = {
   ro: {
     label: "Meniu principal",
     links: [
       { href: "/", label: "Acasă" },
       { href: "/despre", label: "Despre mine" },
-      { href: "/afectiuni", label: "Afecțiuni" },
+      { href: "/servicii", label: "Servicii" },
       { href: "/contact", label: "Contact" },
     ],
     cta: "Programează-te",
@@ -63,7 +63,7 @@ export const nav = {
     links: [
       { href: "/", label: "Home" },
       { href: "/despre", label: "About me" },
-      { href: "/afectiuni", label: "Conditions" },
+      { href: "/servicii", label: "Services" },
       { href: "/contact", label: "Contact" },
     ],
     cta: "Book a visit",

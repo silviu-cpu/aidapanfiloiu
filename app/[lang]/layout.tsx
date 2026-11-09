@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Playfair_Display, Plus_Jakarta_Sans } from "next/font/google";
+import { Newsreader, Plus_Jakarta_Sans } from "next/font/google";
 import { notFound } from "next/navigation";
 import { common, hasLocale, locales, ogLocale } from "@/lib/i18n";
 import { site } from "@/lib/site";
@@ -10,10 +10,10 @@ const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin", "latin-ext"],
 });
 
-const playfair = Playfair_Display({
-  variable: "--font-playfair",
+// Fontul serif al site-ului (titluri). Înlocuiește Playfair, ca să existe un singur serif.
+const newsreader = Newsreader({
+  variable: "--font-newsreader",
   subsets: ["latin", "latin-ext"],
-  style: ["normal", "italic"],
 });
 
 export async function generateStaticParams() {
@@ -48,7 +48,7 @@ export default async function RootLayout({ children, params }: LayoutProps<"/[la
 
   return (
     // data-scroll-behavior: din Next 16, fără el scroll-ul lin ar păstra poziția paginii vechi la navigare.
-    <html lang={lang} data-scroll-behavior="smooth" className={`${jakarta.variable} ${playfair.variable} h-full antialiased`}>
+    <html lang={lang} data-scroll-behavior="smooth" className={`${jakarta.variable} ${newsreader.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col">
         <a
           href="#continut"
