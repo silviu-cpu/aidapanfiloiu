@@ -161,9 +161,35 @@ html.lenis {
   pointer-events: none;
 }
 
+/* Parafa din loader: cerneală neuniformă; apare când ștampila o apasă (clasa is-stamped). */
+.parafa {
+  filter: url(#parafa-ink);
+  opacity: 0;
+}
+
+.parafa.is-stamped {
+  animation: parafa-press 0.35s ease-out both;
+}
+
+@keyframes parafa-press {
+  0% {
+    opacity: 0;
+    transform: scale(1.04);
+  }
+  100% {
+    opacity: 0.92;
+    transform: scale(1);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .hero-hint-line,
-  .loader-wait {
+  .loader-wait,
+  .parafa.is-stamped {
     animation: none;
+  }
+
+  .parafa.is-stamped {
+    opacity: 0.92;
   }
 }
