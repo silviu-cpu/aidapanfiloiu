@@ -3,7 +3,7 @@ import { localePath } from "@/lib/i18n";
 import { site } from "@/lib/site";
 
 // Se adaugă aici fiecare pagină nouă (fără prefix de limbă).
-const pages = ["/"];
+const pages = ["/", "/despre", "/servicii", "/contact"];
 
 export default function sitemap(): MetadataRoute.Sitemap {
   return pages.map((path) => ({

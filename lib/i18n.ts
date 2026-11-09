@@ -7,6 +7,8 @@ export const hasLocale = (value: string): value is Locale =>
 
 /** Româna nu are prefix în URL (/despre), engleza are (/en/despre). */
 export function localePath(lang: Locale, path: string) {
+  if (!path.startsWith("/")) return path;
+  path = path.replace(/^\/(?:en|ro)(?=\/|$)/, "") || "/";
   if (lang === defaultLocale) return path;
   return path === "/" ? "/en" : `/en${path}`;
 }
@@ -45,14 +47,14 @@ export const common = {
   },
 } satisfies Record<Locale, Record<string, string>>;
 
-/** Meniul principal. Paginile din afară de Acasă urmează să fie create. */
+/** Meniul principal. */
 export const nav = {
   ro: {
     label: "Meniu principal",
     links: [
       { href: "/", label: "Acasă" },
       { href: "/despre", label: "Despre mine" },
-      { href: "/afectiuni", label: "Afecțiuni" },
+      { href: "/servicii", label: "Servicii" },
       { href: "/contact", label: "Contact" },
     ],
     cta: "Programează-te",
@@ -63,7 +65,7 @@ export const nav = {
     links: [
       { href: "/", label: "Home" },
       { href: "/despre", label: "About me" },
-      { href: "/afectiuni", label: "Conditions" },
+      { href: "/servicii", label: "Services" },
       { href: "/contact", label: "Contact" },
     ],
     cta: "Book a visit",

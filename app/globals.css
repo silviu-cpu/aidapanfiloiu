@@ -1,16 +1,94 @@
 @import "tailwindcss";
 
-/* Paleta de pornire: se înlocuiește cu culorile alese pentru site. */
 @theme {
-  --color-primary: #2f5d62;
-  --color-primary-hover: #244a4e;
+  /* Paleta site-ului (designul verde ales în Google Stitch). */
+  --color-primary: #003639;
+  --color-primary-hover: #124e51;
+  --color-primary-container: #124e51;
+  --color-primary-fixed: #b5ecef;
+  --color-primary-fixed-dim: #9ad0d3;
+  --color-on-primary: #ffffff;
+
+  --color-secondary: #4f635c;
+  --color-secondary-container: #d1e7de;
+  --color-secondary-fixed: #d1e7de;
+  --color-secondary-fixed-dim: #b6cbc3;
+
+  --color-surface: #f8faf9;
+  --color-surface-lowest: #ffffff;
+  --color-surface-low: #f2f4f3;
+  --color-surface-mid: #eceeed;
+  --color-surface-high: #e6e9e8;
+  --color-on-surface: #191c1c;
+  --color-on-surface-variant: #404849;
+  --color-outline: #707979;
+  --color-outline-variant: #bfc8c8;
+
+  --color-nav: #072b25;
+  --color-mint: #86efd9;
+  --color-mist: #cfe6dd;
+  --color-mist-bg: #f2f8f6;
+  --color-deep: #0b383b;
+  --color-deep-2: #0d3a3c;
+  --color-forest: #0e2b27;
+  --color-forest-2: #163a35;
+  --color-alert: #ba1a1a;
+
+  /* Culorile folosite de hero-ul cu animația. */
   --color-cream: #faf7f4;
   --color-ink: #1f2427;
   --color-muted: #5a6468;
   --color-line: #e3e7e8;
 
   --font-sans: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
-  --font-serif: var(--font-playfair), ui-serif, Georgia, serif;
+  /* Un singur font serif pe tot site-ul: Newsreader. */
+  --font-serif: var(--font-newsreader), ui-serif, Georgia, serif;
+  --font-heading: var(--font-newsreader), ui-serif, Georgia, serif;
+
+  --radius-lg: 1.5rem;
+  --radius-xl: 2rem;
+  --radius-2xl: 2.5rem;
+}
+
+/* Titlurile de pe paginile site-ului (hero-ul cu animația are stilul lui). */
+@layer base {
+  .site-page :where(h1, h2, h3) {
+    font-family: var(--font-heading);
+    font-weight: 400;
+    letter-spacing: -0.015em;
+  }
+
+  ::selection {
+    background: var(--color-secondary-container);
+    color: var(--color-primary);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@utility container-x {
+  width: 100%;
+  max-width: 80rem;
+  margin-inline: auto;
+  padding-inline: 1.5rem;
+
+  @media (width >= 64rem) {
+    padding-inline: 2rem;
+  }
+}
+
+@utility dot-grid {
+  background-image: radial-gradient(var(--color-secondary-container) 1px, transparent 1px);
+  background-size: 24px 24px;
 }
 
 html {

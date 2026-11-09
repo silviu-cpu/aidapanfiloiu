@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { AppointmentLink } from "./site/AppointmentModal";
 import { localePath, nav, type Locale } from "@/lib/i18n";
 
 /** Bara de navigare: o „pastilă” de sticlă care plutește deasupra paginii. */
@@ -42,12 +43,12 @@ export function SiteHeader({ lang, current }: { lang: Locale; current: string })
           >
             {other}
           </Link>
-          <Link
+          <AppointmentLink
             href={localePath(lang, "/contact")}
             className="rounded-full bg-white px-4 py-2 text-xs font-semibold text-ink transition-transform hover:-translate-y-0.5"
           >
             {t.cta}
-          </Link>
+          </AppointmentLink>
         </div>
       </nav>
     </header>
