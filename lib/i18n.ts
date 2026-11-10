@@ -59,6 +59,9 @@ export const nav = {
     ],
     cta: "Programează-te",
     switchLabel: "English version",
+    languageName: "English",
+    menuOpen: "Deschide meniul",
+    menuClose: "Închide meniul",
   },
   en: {
     label: "Main menu",
@@ -70,8 +73,19 @@ export const nav = {
     ],
     cta: "Book a visit",
     switchLabel: "Versiunea în română",
+    languageName: "Română",
+    menuOpen: "Open menu",
+    menuClose: "Close menu",
   },
 } satisfies Record<
   Locale,
-  { label: string; links: { href: string; label: string }[]; cta: string; switchLabel: string }
+  {
+    label: string;
+    links: { href: string; label: string }[];
+    cta: string;
+    switchLabel: string;
+    languageName: string;
+    menuOpen: string;
+    menuClose: string;
+  }
 >;

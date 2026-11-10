@@ -167,3 +167,27 @@ html.lenis {
     animation: none;
   }
 }
+
+/* Apariția lină a secțiunilor la scroll: blocurile urcă 24px din transparență (vezi components/ScrollReveal.tsx). */
+[data-reveal]:not(.is-visible) {
+  opacity: 0;
+}
+[data-reveal].is-visible {
+  animation: reveal-up 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) var(--reveal-delay, 0s) both;
+}
+@keyframes reveal-up {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal] {
+    opacity: 1 !important;
+    animation: none !important;
+  }
+}

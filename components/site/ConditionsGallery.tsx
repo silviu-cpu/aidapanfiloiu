@@ -9,10 +9,11 @@ import { useEffect, useRef, useState } from "react";
 import { conditions, type Condition } from "@/lib/content";
 
 /**
- * Galerie orizontală „fixată”: pe desktop, secțiunea rămâne pe ecran și cardurile
- * alunecă spre stânga în timp ce pacientul derulează în jos.
- * Pe telefon, pe ecrane joase sau cu „reduce motion” devine un carusel obișnuit,
- * astfel încât fișele detaliate pot fi citite integral prin scroll-ul paginii.
+ * Galerie orizontală „fixată”: secțiunea rămâne pe ecran și cardurile alunecă spre
+ * stânga în timp ce pacientul derulează în jos; pagina continuă abia după ultima
+ * afecțiune. Merge la fel pe telefon, unde se poate și glisa stânga–dreapta.
+ * Dacă ecranul e prea jos pentru un card întreg sau e activă „mișcarea redusă”,
+ * devine un carusel obișnuit.
  */
 export default function ConditionsGallery() {
   const { t } = useTranslation();
@@ -26,15 +27,20 @@ export default function ConditionsGallery() {
   const [height, setHeight] = useState<number | undefined>(undefined);
   const [active, setActive] = useState(0);
   const total = conditions.length;
+  const swipe = useRef<{ x: number; y: number; index: number } | null>(null);
 
   useEffect(() => {
-    const mq = window.matchMedia("(min-width: 768px) and (prefers-reduced-motion: no-preference)");
+    const mq = window.matchMedia("(prefers-reduced-motion: no-preference)");
     const update = () => {
       const heading = headingRef.current;
       const card = trackRef.current?.firstElementChild as HTMLElement | null;
-      if (!heading || !card) return;
-      // Titlu + spațiul dintre rânduri + card + spațiu pentru navbar și marginea de jos.
-      const requiredHeight = heading.offsetHeight + card.offsetHeight + 184;
+      const text = card?.lastElementChild as HTMLElement | null | undefined;
+      if (!heading || !card || !text) return;
+      // Când e fixată, cardul ia înălțimea rămasă pe ecran (cel mult 600px); poza se micșorează,
+      // textul nu. Cel mai mic card acceptat: textul întreg + o poză de măcar 96px.
+      const minCard = text.offsetHeight + 96;
+      // Titlu + card + spațiu pentru navbar, margini și bara de jos.
+      const requiredHeight = heading.offsetHeight + minCard + 184;
       setPinned(mq.matches && requiredHeight <= window.innerHeight);
     };
     update();
@@ -72,7 +78,10 @@ export default function ConditionsGallery() {
 
     const measure = () => {
       distance = Math.max(0, track.scrollWidth - window.innerWidth);
-      setHeight(distance + window.innerHeight);
+      // Înălțimea zonei fixate (100svh) nu se schimbă când bara browserului de pe telefon
+      // apare sau dispare, deci secțiunea nu „sare” în timpul derulării.
+      const stage = (section.firstElementChild as HTMLElement | null)?.clientHeight || window.innerHeight;
+      setHeight(distance + stage);
     };
     const onResize = () => {
       measure();
@@ -122,6 +131,21 @@ export default function ConditionsGallery() {
     }
   };
 
+  // Când galeria e fixată, o glisare stânga–dreapta duce la cardul următor sau anterior.
+  const onTouchStart = (e: React.TouchEvent) => {
+    if (!pinned) return;
+    swipe.current = { x: e.touches[0].clientX, y: e.touches[0].clientY, index: active };
+  };
+  const onTouchEnd = (e: React.TouchEvent) => {
+    const start = swipe.current;
+    swipe.current = null;
+    if (!pinned || !start) return;
+    const dx = e.changedTouches[0].clientX - start.x;
+    const dy = e.changedTouches[0].clientY - start.y;
+    if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy)) return;
+    navigate(start.index + (dx < 0 ? 1 : -1));
+  };
+
   const onTrackScroll = () => {
     const track = trackRef.current;
     if (pinned || !track) return;
@@ -147,12 +171,13 @@ export default function ConditionsGallery() {
   return (
     <section
       ref={sectionRef}
+      data-reveal-skip
       className="relative bg-forest text-white"
       style={pinned && height ? { height } : undefined}
       aria-label={t("Afecțiuni tratate")}
     >
-      <div className={pinned ? "sticky top-0 flex h-screen flex-col justify-center overflow-hidden pb-10 pt-24" : "py-16 md:py-20"}>
-        <div ref={headingRef} className="container-x mb-8 flex flex-col justify-between gap-6 md:flex-row md:items-end">
+      <div className={pinned ? "sticky top-0 flex h-svh flex-col overflow-hidden pb-10 pt-24" : "py-16 md:py-20"}>
+        <div ref={headingRef} className="container-x mb-8 flex shrink-0 flex-col justify-between gap-6 md:flex-row md:items-end">
           <div className="flex flex-col gap-2">
             <h2 className="text-4xl text-white md:text-5xl">{t("Afecțiuni tratate")}</h2>
             <p className="text-lg text-mist">
@@ -194,8 +219,12 @@ export default function ConditionsGallery() {
         <div
           ref={trackRef}
           onScroll={onTrackScroll}
+          onTouchStart={onTouchStart}
+          onTouchEnd={onTouchEnd}
           className={`flex items-stretch gap-6 px-6 pb-4 lg:px-8 ${
-            pinned ? "w-max will-change-transform" : "snap-x snap-mandatory overflow-x-auto"
+            pinned
+              ? "min-h-0 w-max flex-1 touch-pan-y will-change-transform"
+              : "snap-x snap-mandatory overflow-x-auto"
           }`}
         >
           {conditions.map((c, i) => {
@@ -203,7 +232,9 @@ export default function ConditionsGallery() {
             return (
               <article
                 key={c.id}
-                className={`flex h-[540px] w-[85vw] shrink-0 snap-center flex-col overflow-hidden rounded-[1.75rem] border bg-forest-2 shadow-xl transition-all duration-500 md:h-[min(600px,70vh)] md:w-[520px] ${
+                className={`flex w-[85vw] shrink-0 snap-center flex-col overflow-hidden rounded-[1.75rem] border bg-forest-2 shadow-xl transition-all duration-500 md:w-[520px] ${
+                  pinned ? "max-h-[600px]" : "h-[540px] md:h-[min(600px,70vh)]"
+                } ${
                   focus ? "scale-100 border-mist/30 opacity-100" : "scale-95 border-mist/10 opacity-70"
                 }`}
               >

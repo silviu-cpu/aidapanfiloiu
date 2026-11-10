@@ -150,6 +150,7 @@ export default function TestimonialCarousel({
     <div
       ref={root}
       role="region"
+      data-reveal-leaf
       aria-roledescription="carousel"
       aria-label={labels.region}
       className="flex flex-col items-center"

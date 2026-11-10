@@ -152,7 +152,8 @@ export default function HomeSections({ lang }: { lang: Locale }) {
     <>
       {/* HIGHLIGHTS */}
       <section className="bg-surface-lowest py-10">
-        <div className="container-x grid grid-cols-2 gap-4 md:grid-cols-4">
+        {/* Pe telefon câte un card pe rând: titlurile lungi („Laparoscopie”) nu încap pe jumătate de ecran. */}
+        <div className="container-x grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4">
           {highlights.map((h) => (
             <div key={h.value} className="flex flex-col rounded-3xl bg-surface-low/60 p-5">
               <span className="font-heading text-3xl text-primary md:text-4xl">{t(h.value)}</span>

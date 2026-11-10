@@ -1,4 +1,5 @@
 import { LocaleProvider } from "@/components/LocaleProvider";
+import { ScrollReveal } from "@/components/ScrollReveal";
 import { SymptomProvider } from "@/components/site/SymptomPicker";
 import { PrivacyProvider } from "@/components/site/PrivacyModal";
 import type { Metadata } from "next";
@@ -68,6 +69,7 @@ export default async function RootLayout({ children, params }: LayoutProps<"/[la
         >
           {t.skip}
         </a>
+        <ScrollReveal />
         <main id="continut" className="w-full flex-1">
           <LocaleProvider lang={lang}>
             <SymptomProvider>
