@@ -90,7 +90,7 @@ export function Faq({ items }: { items: { q: string; a: string }[] }) {
         <details
           key={item.q}
           open={i === 0}
-          className="group rounded-2xl bg-surface-low p-5 transition-colors open:bg-secondary-container/40"
+          className="group rounded-2xl border border-outline-variant/60 bg-surface-lowest p-5 transition-colors open:border-primary/30"
         >
           <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-semibold text-on-surface [&::-webkit-details-marker]:hidden">
             <span>{t(item.q)}</span>

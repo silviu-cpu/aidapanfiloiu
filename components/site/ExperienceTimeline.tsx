@@ -12,7 +12,7 @@ export type ExperienceItem = {
 
 /**
  * Timeline animat la scroll: linia se „umple” cu mentă pe măsură ce derulezi,
- * iar fiecare bulină se aprinde când linia ajunge la ea. Ultima aprinsă pulsează.
+ * iar fiecare bulină devine verde când linia ajunge la ea.
  */
 export default function ExperienceTimeline({ items }: { items: ExperienceItem[] }) {
   const { t } = useTranslation();
@@ -97,13 +97,12 @@ export default function ExperienceTimeline({ items }: { items: ExperienceItem[] 
       <span
         ref={fillRef}
         aria-hidden
-        className="absolute left-[7px] w-0.5 rounded-full bg-mint shadow-[0_0_12px_rgba(134,239,217,0.7)]"
+        className="absolute left-[7px] w-0.5 rounded-full bg-mint"
         style={{ top: 12, height: 0 }}
       />
 
       {items.map((item, i) => {
         const on = i < lit;
-        const current = on && i === lit - 1;
         return (
           <li key={`${item.years}-${item.title}`} className="relative pl-10">
             <span
@@ -113,12 +112,10 @@ export default function ExperienceTimeline({ items }: { items: ExperienceItem[] 
               aria-hidden
               className={`absolute left-0 top-1 flex h-4 w-4 items-center justify-center rounded-full border-2 transition-all duration-500 ${
                 on
-                  ? "scale-110 border-mint bg-mint shadow-[0_0_0_6px_rgba(134,239,217,0.15)]"
+                  ? "scale-110 border-mint bg-mint"
                   : "border-white/30 bg-forest"
               }`}
-            >
-              {current && <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-mint opacity-60 motion-reduce:animate-none" />}
-            </span>
+            />
             <div
               className={`flex flex-col gap-1 transition-all duration-500 sm:flex-row sm:items-baseline sm:gap-6 ${
                 on ? "translate-x-0 opacity-100" : "translate-x-2 opacity-40"

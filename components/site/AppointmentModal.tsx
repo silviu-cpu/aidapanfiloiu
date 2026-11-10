@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import { X } from "lucide-react";
 import CallbackForm from "./CallbackForm";
+import { contact } from "@/lib/content";
 
 const AppointmentContext = createContext<(() => void) | null>(null);
 
@@ -64,6 +65,10 @@ export function AppointmentProvider({ children }: { children: ReactNode }) {
           </button>
           <h2 id="appointment-title" className="pr-10 font-heading text-3xl text-primary">{t("Programează o consultație")}</h2>
           <p id="appointment-description" className="mt-3 text-on-surface-variant">{t("Lasă-mi numele și numărul de telefon, te sun pentru a stabili programarea.")}</p>
+          <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-sm text-primary">
+            <a href={contact.phoneHref} className="underline decoration-primary/30 underline-offset-4 hover:decoration-primary">{contact.phoneDisplay}</a>
+            <a href={`mailto:${contact.email}`} className="break-all underline decoration-primary/30 underline-offset-4 hover:decoration-primary">{contact.email}</a>
+          </div>
         </div>
         {open && <CallbackForm />}
       </dialog>

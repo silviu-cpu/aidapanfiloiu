@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { AppointmentLink } from "./site/AppointmentModal";
 import { localePath, nav, type Locale } from "@/lib/i18n";
 
@@ -11,11 +12,11 @@ export function SiteHeader({ lang, current }: { lang: Locale; current: string })
     <header className="pointer-events-none fixed inset-x-0 top-4 z-50 px-4">
       <nav
         aria-label={t.label}
-        className="pointer-events-auto mx-auto flex max-w-3xl items-center justify-between gap-4 rounded-full border border-white/15 bg-[#0f2629]/60 py-2 pl-5 pr-2 text-white shadow-xl shadow-black/20 backdrop-blur-xl"
+        className="pointer-events-auto mx-auto flex max-w-3xl items-center justify-between gap-2 rounded-full border border-white/15 bg-[#0f2629]/60 py-2 pl-3 pr-2 text-white shadow-xl shadow-black/20 backdrop-blur-xl sm:gap-4 sm:pl-5"
       >
-        <Link href={localePath(lang, "/")} className="flex items-center gap-2 text-sm font-semibold">
-          <span className="size-1.5 rounded-full bg-[#8fe6ea]" aria-hidden="true" />
-          Dr. Aida Panfiloiu
+        <Link href={localePath(lang, "/")} className="flex items-center gap-2 text-xs font-semibold sm:text-sm">
+          <Image src="/brand/logo.svg" width={32} height={32} alt="" aria-hidden="true" className="size-6 shrink-0 sm:size-8" />
+          <span className="max-w-[5.5rem] leading-tight sm:max-w-none">Dr. Aida Panfiloiu</span>
         </Link>
 
         <ul className="hidden items-center gap-1 text-xs font-medium md:flex">
@@ -39,13 +40,13 @@ export function SiteHeader({ lang, current }: { lang: Locale; current: string })
             hrefLang={other}
             lang={other}
             aria-label={t.switchLabel}
-            className="rounded-full px-3 py-2 text-xs font-semibold uppercase text-white/75 transition-colors hover:bg-white/10 hover:text-white"
+            className="rounded-full px-2 py-2 text-xs font-semibold uppercase text-white/75 transition-colors hover:bg-white/10 hover:text-white sm:px-3"
           >
             {other}
           </Link>
           <AppointmentLink
             href={localePath(lang, "/contact")}
-            className="rounded-full bg-white px-4 py-2 text-xs font-semibold text-ink transition-transform hover:-translate-y-0.5"
+            className="whitespace-nowrap rounded-full bg-white px-3 py-2 text-[11px] font-semibold text-ink transition-transform hover:-translate-y-0.5 sm:px-4 sm:text-xs"
           >
             {t.cta}
           </AppointmentLink>

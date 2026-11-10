@@ -95,14 +95,6 @@ export default function ServicesTable() {
             );
           })}
         </div>
-        <div className="flex flex-wrap items-center gap-4 border-t border-outline-variant/30 pt-4">
-          {(Object.keys(serviceGroups) as ServiceGroup[]).map((g) => (
-            <span key={g} className="flex items-center gap-2 text-sm text-on-surface-variant">
-              <span className={`h-3.5 w-3.5 rounded-sm border border-outline-variant/50 ${groupTile[g]}`} />
-              {t(serviceGroups[g])}
-            </span>
-          ))}
-        </div>
       </div>
     </div>
   );

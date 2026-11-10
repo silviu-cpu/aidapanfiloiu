@@ -15,6 +15,14 @@ const nextConfig: NextConfig = {
       },
     },
   },
+  // Același compilator Tailwind și pentru verificările făcute cu --webpack.
+  webpack(config) {
+    config.module.rules.push({
+      test: /[\\/]app[\\/]globals\.css$/,
+      use: ["@tailwindcss/turbopack"],
+    });
+    return config;
+  },
 };
 
 export default nextConfig;

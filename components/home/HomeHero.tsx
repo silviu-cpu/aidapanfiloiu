@@ -42,7 +42,9 @@ export function HomeHero({
   conditionsHref: string;
 }) {
   const trackRef = useRef<HTMLElement>(null);
-  const store = useRef<HeroStore>({ progress: 0, pointerX: 0, pointerY: 0, reduced: false, revealedAt: 0 });
+  const stageRef = useRef<HTMLDivElement>(null);
+  const sceneTwoRef = useRef<HTMLDivElement>(null);
+  const store = useRef<HeroStore>({ progress: 0, pointerX: 0, pointerY: 0, reduced: false, revealedAt: 0, textBottom: 0 });
   const [reduced, setReduced] = useState(false);
   const [active, setActive] = useState(true);
   const [canvasReady, setCanvasReady] = useState(false);
@@ -89,6 +91,22 @@ export function HomeHero({
     }, trackRef);
     return () => ctx.revert();
   }, [loaded, reduced]);
+
+  // Scena 3D trebuie să știe unde se termină textul din scena 2, ca tava să înceapă sub el.
+  useEffect(() => {
+    const stage = stageRef.current;
+    const text = sceneTwoRef.current;
+    if (!stage || !text) return;
+    const measure = () => {
+      const height = stage.clientHeight;
+      store.current.textBottom = height ? (text.offsetTop + text.offsetHeight) / height : 0;
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(stage);
+    ro.observe(text);
+    return () => ro.disconnect();
+  }, [reduced, store]);
 
   // Respectăm setarea de sistem „mișcare redusă”.
   useEffect(() => {
@@ -182,7 +200,7 @@ export function HomeHero({
         aria-labelledby="hero-title"
         className={reduced ? "relative" : "relative h-[340svh]"}
       >
-        <div className="hero-bg sticky top-0 h-svh overflow-hidden text-white">
+        <div ref={stageRef} className="hero-bg sticky top-0 h-svh overflow-hidden text-white">
           <div className="absolute inset-0" aria-hidden="true">
             {drawn && <HeroCanvas store={store} active={active} onReady={() => setCanvasReady(true)} />}
           </div>
@@ -261,7 +279,11 @@ export function HomeHero({
 
           {/* Scena 2: textul de deasupra tăvii */}
           {!reduced && (
-            <div data-hero-s2 className="invisible absolute inset-x-0 top-0 z-10 px-5 pt-28 text-center opacity-0 sm:pt-32">
+            <div
+              ref={sceneTwoRef}
+              data-hero-s2
+              className="invisible absolute inset-x-0 top-0 z-10 px-5 pt-28 text-center opacity-0 sm:pt-32 [@media(max-height:760px)]:pt-24"
+            >
               <SceneTwoText copy={copy} />
             </div>
           )}
@@ -289,8 +311,8 @@ function SceneTwoText({ copy }: { copy: HeroCopy }) {
   return (
     <div className="mx-auto max-w-2xl">
       <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#8fe6ea]">{copy.s2Eyebrow}</p>
-      <h2 className="mt-3 font-serif text-3xl leading-tight sm:text-4xl lg:text-5xl">{copy.s2Title}</h2>
-      <p className="mx-auto mt-4 max-w-lg text-sm leading-relaxed text-white/70 sm:text-base">{copy.s2Text}</p>
+      <h2 className="mt-3 font-serif text-3xl leading-tight sm:text-4xl lg:text-5xl [@media(max-height:760px)]:text-3xl">{copy.s2Title}</h2>
+      <p className="mx-auto mt-4 max-w-lg text-sm leading-relaxed text-white/70 sm:text-base [@media(max-height:760px)]:mt-3 [@media(max-height:760px)]:text-sm">{copy.s2Text}</p>
     </div>
   );
 }

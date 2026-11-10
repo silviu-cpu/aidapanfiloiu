@@ -41,6 +41,11 @@ export default function Footer({ lang }: { lang: Locale }) {
                   {t("WhatsApp:")}{" "}{t(contact.whatsappDisplay)}
                 </a>
               </li>
+              <li>
+                <a href={`mailto:${contact.email}`} className="break-words hover:text-primary">
+                  Email: {contact.email}
+                </a>
+              </li>
             </ul>
           </div>
 

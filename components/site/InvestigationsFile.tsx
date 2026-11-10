@@ -3,7 +3,7 @@
 import { useTranslation } from "@/components/LocaleProvider";
 
 import { useEffect, useRef, useState } from "react";
-import { FileText, MousePointer2 } from "lucide-react";
+import { FileText } from "lucide-react";
 import { investigations } from "@/lib/content";
 
 const tabColors = [
@@ -95,8 +95,6 @@ export default function InvestigationsFile() {
             );
           })}
         </div>
-        <p className="mt-10 flex items-center justify-center gap-2 text-sm text-on-surface-variant">
-          <MousePointer2 size={16} /> {t("Treci cu mouse-ul peste o fișă ca să vezi detaliile.")}</p>
       </div>
 
       {/* Telefon: listă */}

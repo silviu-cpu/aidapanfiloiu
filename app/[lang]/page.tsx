@@ -3,7 +3,7 @@ import { HomeHero, type HeroCopy } from "@/components/home/HomeHero";
 import { SiteHeader } from "@/components/SiteHeader";
 import Footer from "@/components/site/Footer";
 import HomeSections from "@/components/site/HomeSections";
-import { alternates, common, getLang, localePath, type Locale } from "@/lib/i18n";
+import { alternates, getLang, localePath, type Locale } from "@/lib/i18n";
 import { site } from "@/lib/site";
 
 const hero: Record<Locale, HeroCopy> = {
@@ -44,7 +44,7 @@ const hero: Record<Locale, HeroCopy> = {
 export async function generateMetadata({ params }: PageProps<"/[lang]">): Promise<Metadata> {
   const lang = await getLang(params);
   return {
-    title: { absolute: `${site.name} — ${common[lang].tagline}` },
+    title: { absolute: site.name },
     alternates: alternates(lang, "/"),
   };
 }
