@@ -20,11 +20,11 @@ import {
   MessageCircle,
   Microscope,
   ShieldCheck,
-  Star,
   Stethoscope,
 } from "lucide-react";
 import { ButtonLink, Faq } from "@/components/site/ui";
-import { doctor, images, surgeryNote, testimonial } from "@/lib/content";
+import { doctor, images, surgeryNote, testimonials } from "@/lib/content";
+import TestimonialCarousel from "@/components/site/TestimonialCarousel";
 
 // Categoriile din Stitch, fără cifrele inventate (98%, 4.9 stele, 100%).
 // TODO: „10+ ani” (rezidențiat din 2016) de confirmat cu doamna doctor.
@@ -273,20 +273,20 @@ export default function HomeSections({ lang }: { lang: Locale }) {
         </div>
       </section>
 
-      {/* RECENZIE (din Stitch). TODO: înlocuită cu o recenzie reală, cu acordul pacientului. */}
+      {/* RECENZII: se schimbă singure, cu animație. TODO: înlocuite cu recenzii reale, cu acordul pacienților. */}
       <section className="relative overflow-hidden bg-deep-2 py-20">
         <div className="dot-grid pointer-events-none absolute inset-0 opacity-15" />
-        <div className="relative mx-auto flex max-w-4xl flex-col items-center px-6 text-center">
-          <div className="mb-6 flex gap-1 text-primary-fixed" aria-label={t("5 din 5 stele")}>
-            {Array.from({ length: 5 }).map((_, i) => (
-              <Star key={i} size={20} fill="currentColor" strokeWidth={0} />
-            ))}
-          </div>
-          <blockquote className="font-heading text-3xl leading-snug text-white md:text-[40px]">
-            „{t(testimonial.text)}”
-          </blockquote>
-          <span className="mt-8 text-lg font-semibold text-white">{t(testimonial.author)}</span>
-          <span className="text-primary-fixed-dim">{t(testimonial.role)}</span>
+        <div className="relative mx-auto max-w-4xl px-6 text-center">
+          <TestimonialCarousel
+            items={testimonials.map((item) => ({ text: t(item.text), author: t(item.author), role: t(item.role) }))}
+            labels={{
+              region: t("Recenziile pacienților"),
+              review: t("Recenzia"),
+              pause: t("Oprește derularea recenziilor"),
+              play: t("Pornește derularea recenziilor"),
+              stars: t("5 din 5 stele"),
+            }}
+          />
         </div>
       </section>
 
@@ -301,7 +301,7 @@ export default function HomeSections({ lang }: { lang: Locale }) {
                 <p className="leading-relaxed text-on-surface-variant">
                   {t("Activitatea chirurgicală este împărțită între cabinete pentru consultații și diagnostic și spitale dotate cu bloc operator complet pentru intervenții.")}{" "}{t(surgeryNote)}
                 </p>
-                <ButtonLink href={localePath(lang, "/contact")} className="max-w-max">
+                <ButtonLink href={localePath(lang, "/contact#locatii")} className="max-w-max">
                   {t("Vezi programul disponibil")}{" "}<Clock size={16} />
                 </ButtonLink>
               </div>

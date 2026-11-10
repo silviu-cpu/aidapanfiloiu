@@ -1,6 +1,8 @@
-// Datele de bază ale site-ului. Adresa finală se completează la lansare.
+import { contact } from "./content";
+
+// Datele de bază ale site-ului.
 export const site = {
-  name: "Aida Panfiloiu",
+  name: "Dr. Aida Panfiloiu",
   url: "https://www.aidapanfiloiu.ro",
-  email: "",
+  email: contact.email,
 };

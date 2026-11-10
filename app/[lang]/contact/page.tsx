@@ -2,23 +2,13 @@ import { translator } from "@/lib/translate";
 import type { Metadata } from "next";
 import { SiteHeader } from "@/components/SiteHeader";
 import Footer from "@/components/site/Footer";
-import { alternates, getLang, localePath, type Locale } from "@/lib/i18n";
-import Photo from "@/components/site/Photo";
-import { Info } from "lucide-react";
+import { alternates, getLang } from "@/lib/i18n";
+import LocationsMap from "@/components/site/LocationsMap";
 import CallbackForm from "@/components/site/CallbackForm";
 import Triage from "@/components/site/Triage";
 import HeroBackdrop, { heroSectionClass } from "@/components/site/HeroBackdrop";
 import { Faq, SectionTitle } from "@/components/site/ui";
-import { contact, disclaimer, images, locations, surgeryNote } from "@/lib/content";
-
-// Poziții schematice pe hartă (nu sunt coordonate reale).
-const pins = [
-  { id: "grivita", label: "MedLife Grivița", x: 150, y: 120 },
-  { id: "plaga", label: "Clinica Dr. Plagă", x: 260, y: 55 },
-  { id: "victoria", label: "Clinica Victoria", x: 215, y: 175, main: true },
-  { id: "royal", label: "Royal Hospital", x: 310, y: 185 },
-  { id: "titan", label: "MedLife Titan", x: 370, y: 235 },
-];
+import { contact, disclaimer } from "@/lib/content";
 
 const channels = [
   { label: "WhatsApp", value: contact.whatsappDisplay, href: contact.whatsappHref },
@@ -69,79 +59,20 @@ export default async function ContactPage({ params }: PageProps<"/[lang]/contact
         <div className="relative mx-auto flex max-w-6xl flex-col items-center">
           <h1 className="mb-3 max-w-3xl text-center text-5xl text-white md:text-6xl">{t("Cu ce te pot ajuta?")}</h1>
           <p className="mb-10 max-w-xl text-center text-lg text-secondary-fixed">
-            {t("Alege ce te deranjează și îți arăt unde te poți programa.")}</p>
+            {t("Alege ce te deranjează. Poți selecta mai multe variante, iar la consultație discutăm fiecare problemă.")}</p>
           <Triage />
         </div>
       </section>
 
       {/* UNDE MĂ GĂSEȘTI */}
-      <section className="bg-surface-lowest py-16 md:py-20">
+      <section id="locatii" className="scroll-mt-24 bg-surface-lowest py-16 md:py-20">
         <div className="container-x">
           <div className="mb-10">
             <SectionTitle title={t("Unde mă găsești")} />
           </div>
-          <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-12">
-            <div className="flex flex-col rounded-[2rem] bg-surface-low p-6 lg:col-span-6">
-              <div className="flex items-center justify-between pb-4">
-                <span className="text-sm font-semibold text-secondary">{t("Locațiile mele în București")}</span>
-                <span className="rounded-full bg-surface-mid px-2.5 py-0.5 text-xs text-on-surface-variant">
-                  {locations.length} {t("locații")}</span>
-              </div>
-              <div className="aspect-[4/3] w-full rounded-2xl bg-surface-lowest/80 p-2 shadow-inner">
-                <svg viewBox="0 0 460 340" className="h-full w-full" role="img" aria-label={t("Hartă schematică a locațiilor")}>
-                  <path d="M 10 70 Q 120 85 240 60 T 450 50" stroke="#d1e7de" strokeWidth="6" strokeLinecap="round" fill="none" />
-                  <path d="M 20 280 Q 180 230 250 170 T 440 140" stroke="#d1e7de" strokeWidth="7" strokeLinecap="round" fill="none" />
-                  <circle cx="230" cy="170" r="110" stroke="#e1e3e2" strokeDasharray="3 3" strokeWidth="1.5" fill="none" />
-                  <circle cx="230" cy="170" r="60" stroke="#e1e3e2" strokeWidth="1" fill="none" />
-                  <path d="M 40 40 L 420 300 M 40 260 L 420 80 M 230 20 L 230 320 M 20 170 L 440 170" stroke="#eceeed" strokeWidth="2" />
-                  {pins.map((p) => (
-                    <g key={p.id}>
-                      <circle cx={p.x} cy={p.y} r={p.main ? 18 : 16} fill="#124e51" fillOpacity={p.main ? 0.2 : 0.12} />
-                      <circle cx={p.x} cy={p.y} r={p.main ? 8 : 7} fill={p.main ? "#003639" : "#124e51"} />
-                      <circle cx={p.x} cy={p.y} r="3" fill="#ffffff" />
-                      <text
-                        x={p.x}
-                        y={p.y > 150 ? p.y + 26 : p.y - 16}
-                        textAnchor="middle"
-                        fontSize="10"
-                        fontWeight={p.main ? 700 : 600}
-                        fill="#124e51"
-                        fontFamily="var(--font-jakarta), sans-serif"
-                      >
-                        {t(p.label)}
-                      </text>
-                    </g>
-                  ))}
-                </svg>
-              </div>
-              <p className="mt-3 text-xs text-on-surface-variant">{t("Hartă schematică, nu la scară.")}</p>
-            </div>
-
-            <div className="flex flex-col lg:col-span-6">
-              <ul className="flex flex-col divide-y divide-surface-mid">
-                {locations.map((l) => (
-                  <li key={l.id} className="flex items-start gap-3 py-4">
-                    <span className="mt-2 h-2.5 w-2.5 shrink-0 rounded-full bg-primary" />
-                    <div>
-                      <div className="flex flex-wrap items-center gap-2">
-                        <h3 className="font-sans text-lg font-semibold text-on-surface">{t(l.name)}</h3>
-                        <span className="rounded-full bg-secondary-container px-2 py-0.5 text-xs text-secondary">{t(l.area)}</span>
-                      </div>
-                      <p className="mt-1 text-on-surface-variant">{t(l.services)}</p>
-                      {/* TODO: programul pentru fiecare locație. */}
-                    </div>
-                  </li>
-                ))}
-              </ul>
-              <div className="mt-6 flex items-center gap-3 rounded-2xl bg-secondary-container/40 p-4">
-                <Info className="shrink-0 text-primary" size={20} />
-                <p className="font-semibold text-primary">{t(surgeryNote)}</p>
-              </div>
-            </div>
-          </div>
+          <LocationsMap />
         </div>
       </section>
-
       {/* CANALE DIRECTE */}
       <section className="bg-mist-bg px-6 py-16 md:py-20">
         <div className="mx-auto flex max-w-5xl flex-col items-center">
@@ -165,21 +96,15 @@ export default async function ContactPage({ params }: PageProps<"/[lang]/contact
       </section>
 
       {/* VREI SĂ TE SUN EU */}
-      <section className="bg-surface-lowest py-16 md:py-20">
-        <div className="container-x grid grid-cols-1 items-center gap-10 lg:grid-cols-12">
-          <div className="flex flex-col gap-6 lg:col-span-5">
+      <section id="formular-programare" className="scroll-mt-24 bg-surface-lowest py-16 md:py-20">
+        <div className="container-x">
+          <div className="mb-10">
             <SectionTitle
               title={t("Vrei să te sun eu?")}
               intro={t("Lasă-mi numele și numărul de telefon, te sun pentru a stabili programarea.")}
             />
-            <div className="relative h-56 overflow-hidden rounded-[2rem] bg-primary-container shadow-md">
-              <Photo src={images.consultation} alt={t("Discuție despre documentele medicale în timpul consultației")} sizes="(min-width: 1024px) 40vw, 100vw" className="object-cover" />
-              <div className="absolute inset-0 bg-gradient-to-t from-primary/70 via-transparent to-transparent" />
-            </div>
           </div>
-          <div className="lg:col-span-7">
-            <CallbackForm />
-          </div>
+          <CallbackForm twoColumns />
         </div>
       </section>
 
@@ -211,3 +136,4 @@ export default async function ContactPage({ params }: PageProps<"/[lang]/contact
     </>
   );
 }
+

@@ -5,13 +5,13 @@ import Footer from "@/components/site/Footer";
 import { alternates, getLang, localePath, type Locale } from "@/lib/i18n";
 import Photo from "@/components/site/Photo";
 import Link from "next/link";
-import { ArrowDown, ArrowRight, Siren } from "lucide-react";
+import { ArrowDown, ArrowRight } from "lucide-react";
 import ConditionsGallery from "@/components/site/ConditionsGallery";
 import HeroBackdrop, { heroSectionClass } from "@/components/site/HeroBackdrop";
 import InvestigationsFile from "@/components/site/InvestigationsFile";
 import ServicesTable from "@/components/site/ServicesTable";
 import { ButtonLink, SectionTitle } from "@/components/site/ui";
-import { contact, disclaimer, images, locations, surgeryNote } from "@/lib/content";
+import { contact, disclaimer, doctor, images, locations, surgeryNote } from "@/lib/content";
 
 const laparoscopyBenefits = [
   "Câteva incizii mici",
@@ -75,15 +75,18 @@ export default async function ServiciiPage({ params }: PageProps<"/[lang]/servic
             </div>
           </div>
           <div className="lg:col-span-5">
-            <div className="relative aspect-[4/3] w-full overflow-hidden rounded-[2rem] bg-primary-container/40 shadow-xl">
+            {/* Cadru pătrat, ca poza (520 × 520) să apară întreagă, fără tăieturi. */}
+            <div className="relative mx-auto aspect-square w-full max-w-[480px] overflow-hidden rounded-[2rem] bg-primary-container/40 shadow-xl lg:mr-0">
+              {/* Fotografia doamnei doctor (520 × 520 px), servită fără recomprimare ca să rămână clară. */}
               <Photo
-                src={images.consultation}
-                alt={t("Discuție despre documentele medicale în timpul consultației")}
+                src={images.doctor}
+                alt={`${doctor.name}, ${t(doctor.title)}`}
                 preload
+                unoptimized
                 sizes="(min-width: 1024px) 40vw, 100vw"
                 className="object-cover"
               />
-              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-deep/80 via-transparent to-transparent" />
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-deep/40 via-transparent to-transparent" />
             </div>
           </div>
         </div>
@@ -113,8 +116,6 @@ export default async function ServiciiPage({ params }: PageProps<"/[lang]/servic
           <div className="mt-10 md:mt-0">
             <InvestigationsFile />
           </div>
-          <p className="mt-6 text-center text-sm text-on-surface-variant">
-            {t("Investigațiile exacte se stabilesc la consultație.")}</p>
         </div>
       </section>
 
@@ -156,23 +157,23 @@ export default async function ServiciiPage({ params }: PageProps<"/[lang]/servic
       {/* URGENȚE */}
       <section className="bg-surface py-16 md:py-20">
         <div className="container-x">
-          <div className="flex flex-col items-start justify-between gap-6 rounded-[2rem] border-l-4 border-l-primary bg-surface-lowest p-6 shadow-sm md:flex-row md:items-center">
-            <div className="max-w-3xl">
-              <h3 className="mb-3 font-sans text-lg font-semibold text-primary">{t("Mergi la urgență dacă ai:")}</h3>
-              <ul className="grid grid-cols-1 gap-x-6 gap-y-2 text-on-surface-variant sm:grid-cols-2">
-                {emergencies.map((e) => (
-                  <li key={e} className="flex items-center gap-2">
-                    <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
-                    {t(e)}
-                  </li>
-                ))}
-              </ul>
+          <div className="grid gap-8 border-y border-outline-variant/50 py-8 md:gap-12 md:py-10 lg:grid-cols-[1fr_2fr]">
+            <div className="flex flex-col items-start gap-5">
+              <h2 className="max-w-xs font-heading text-3xl leading-tight text-on-surface">{t("Mergi la urgență dacă ai:")}</h2>
+              <a
+                href="tel:112"
+                className="inline-flex min-h-11 items-center text-base font-semibold text-alert underline decoration-alert/40 underline-offset-4 transition-colors hover:decoration-alert focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-alert"
+              >
+                {t("Sună la 112")}
+              </a>
             </div>
-            <a
-              href="tel:112"
-              className="inline-flex shrink-0 items-center gap-2 rounded-full bg-alert px-6 py-3 font-semibold text-white"
-            >
-              <Siren size={18} /> {t("Sună la 112")}</a>
+            <ul className="divide-y divide-outline-variant/40 text-base leading-relaxed text-on-surface-variant">
+              {emergencies.map((e) => (
+                <li key={e} className="py-4 first:pt-0 last:pb-0">
+                  {t(e)}
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
       </section>
@@ -218,21 +219,21 @@ export default async function ServiciiPage({ params }: PageProps<"/[lang]/servic
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-5">
             {locations.map((l) => (
               <div key={l.id} className="flex min-h-[160px] flex-col rounded-2xl bg-primary-container/60 p-5">
-                <span className="mb-2 max-w-max rounded-full bg-secondary-container/20 px-2.5 py-0.5 text-xs font-semibold text-primary-fixed">
-                  {t(l.tag)}
-                </span>
                 <h3 className="font-sans font-semibold text-white">{t(l.name)}</h3>
-                <p className="mt-1 text-sm text-surface-high">{t(l.services)}</p>
+                <p className="mt-4 text-sm leading-relaxed text-surface-high">{t(l.services)}</p>
               </div>
             ))}
           </div>
           <div className="mt-6 flex flex-wrap items-center justify-between gap-4 rounded-2xl bg-nav p-4">
-            <span className="flex items-center gap-2 font-medium">
-              <span className="h-2 w-2 rounded-full bg-primary-fixed" />
+            <span className="font-medium">
               {t(surgeryNote)}
             </span>
-            <Link href={localePath(lang, "/contact")} className="text-sm text-primary-fixed hover:underline">
-              {t("Vezi adresele și programul →")}</Link>
+            <Link
+              href={localePath(lang, "/contact#locatii")}
+              className="inline-flex min-h-11 w-full shrink-0 items-center justify-center rounded-full border border-primary-fixed/25 bg-primary-fixed/5 px-5 py-2.5 text-sm font-semibold text-primary-fixed transition-colors hover:border-primary-fixed/50 hover:bg-primary-fixed/15 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary-fixed sm:w-auto"
+            >
+              {t("Vezi adresele și programul")}
+            </Link>
           </div>
         </div>
       </section>
