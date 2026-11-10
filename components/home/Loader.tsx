@@ -241,7 +241,7 @@ export function Loader({
 
         {/* Parafa sub nume, iar deasupra ei ștampila care coboară, apasă și pleacă */}
         {/* Destul de jos încât ștampila, când apasă, să nu acopere semnătura. */}
-        <div aria-hidden="true" className="absolute -bottom-36 right-[2%] sm:-bottom-[11.5rem]">
+        <div aria-hidden="true" className="absolute -bottom-44 right-[2%] sm:-bottom-[11.5rem]">
           <div
             ref={parafa}
             className="parafa rounded-[10px] border-[3px] border-double border-[#8fe6ea]/80 px-4 py-2 text-center font-serif leading-tight text-[#8fe6ea]/85"
