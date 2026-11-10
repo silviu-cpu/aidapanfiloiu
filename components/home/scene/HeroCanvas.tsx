@@ -16,11 +16,13 @@ export default function HeroCanvas({
   onReady?: () => void;
 }) {
   const [ready, setReady] = useState(false);
+  // Pe telefon desenăm la rezoluție mai mică: ecranul e mic, iar placa video e mai slabă.
+  const [dpr] = useState<[number, number]>(() => (window.innerWidth < 768 ? [1, 1.5] : [1, 1.75]));
 
   return (
     <Canvas
       frameloop={active ? "always" : "never"}
-      dpr={[1, 1.75]}
+      dpr={dpr}
       shadows
       camera={{ position: CAMERA_START.toArray(), fov: CAMERA_FOV, near: 0.1, far: 60 }}
       gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}

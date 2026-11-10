@@ -12,7 +12,7 @@ const KNOT_MS = 550;
 const STAMP_MS = 1100;
 const MAX_WAIT_MS = 4000;
 const HOLD_MS = 350;
-const EXIT_MS = 800;
+const EXIT_MS = 700;
 
 /** Bucla de la finalul semnăturii, desenată față de ultimul ei punct. */
 const KNOT = "M0 0C26 -44 86 -40 70 4C58 38 8 26 22 -6C34 -34 74 -30 104 -8";
@@ -140,9 +140,11 @@ export function Loader({
     return () => cancelAnimationFrame(raf);
   }, [reduced]);
 
-  // Cât timp loader-ul acoperă ecranul, pagina de dedesubt nu se mai desenează.
+  // Cât timp se animă semnătura, pagina de dedesubt nu se desenează (ca animația să fie fluidă).
+  // Când semnătura e gata, pagina se desenează în spatele loader-ului încă opac: așa, prima
+  // desenare (grea pe telefon) nu mai cade peste ieșirea loader-ului.
   useEffect(() => {
-    if (phase === "leaving" || phase === "gone") return;
+    if (phase !== "drawing") return;
     const html = document.documentElement;
     html.classList.add("site-loading");
     return () => html.classList.remove("site-loading");
@@ -173,8 +175,8 @@ export function Loader({
     <div
       role="status"
       aria-live="polite"
-      className={`site-loader hero-bg fixed inset-0 z-[70] flex flex-col items-center justify-center px-6 text-white transition-[opacity,transform] duration-[800ms] ease-[cubic-bezier(0.7,0,0.2,1)] ${
-        phase === "leaving" ? "pointer-events-none -translate-y-6 opacity-0" : ""
+      className={`site-loader hero-bg fixed inset-0 z-[70] flex flex-col items-center justify-center px-6 text-white transition-opacity duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] will-change-[opacity] ${
+        phase === "leaving" ? "pointer-events-none opacity-0" : ""
       }`}
     >
       <span className="sr-only">{label}</span>

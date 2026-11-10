@@ -263,7 +263,8 @@ export function Scene({ store }: { store: RefObject<HeroStore> }) {
         position={[TRAY_POSITION.x + 2.5, TRAY_POSITION.y + 8, TRAY_POSITION.z + 3.5]}
         intensity={1.4}
         castShadow
-        shadow-mapSize={[2048, 2048]}
+        // Pe telefon (ecran vertical), umbra la rezoluție mai mică: arată la fel, costă de 4 ori mai puțin.
+        shadow-mapSize={portrait ? [1024, 1024] : [2048, 2048]}
         shadow-camera-left={-4.5}
         shadow-camera-right={4.5}
         shadow-camera-top={4.5}
