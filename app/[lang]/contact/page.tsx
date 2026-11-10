@@ -1,4 +1,6 @@
-import { translator } from "@/lib/translate";
+import { translator } from "@/lib/translate";
+import { ScrollReveal } from "@/components/ScrollReveal";
+import SectionFade from "@/components/site/SectionFade";
 import type { Metadata } from "next";
 import { SiteHeader } from "@/components/SiteHeader";
 import Footer from "@/components/site/Footer";
@@ -116,22 +118,23 @@ export default async function ContactPage({ params }: PageProps<"/[lang]/contact
         </div>
       </section>
 
-      {/* URGENȚE */}
-      <section className="bg-primary px-6 py-3.5 text-white">
-        <div className="mx-auto flex max-w-6xl items-center justify-center gap-3 text-center">
-          <span className="relative flex h-2.5 w-2.5">
+      <SectionFade from="primary" to="surface-mid" />
+      {/* URGENȚE + MENȚIUNE: pe fundalul deschis de la final */}
+      <section className="flex flex-col items-center gap-2 bg-surface-mid px-6 py-5">
+        <p className="flex items-center justify-center gap-3 text-center text-[15px] font-semibold text-primary">
+          <span className="relative flex h-2.5 w-2.5 shrink-0">
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75" />
             <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-red-500" />
           </span>
-          <span className="text-[15px] font-semibold">
-            {t("Pentru urgențe medicale sună la")}{" "}<a href="tel:112" className="underline">112</a>.
+          <span>
+            {t("Pentru urgențe medicale sună la")}{" "}<a href="tel:112" className="underline underline-offset-2">112</a>.
           </span>
-        </div>
-      </section>
-      <section className="bg-surface-mid px-6 py-4">
+        </p>
         <p className="text-center text-xs text-on-surface-variant">{t(disclaimer)}</p>
       </section>
       </div>
+      {/* Apariția lină a secțiunilor; rulează după ce pagina e hidratată. */}
+      <ScrollReveal />
       <Footer lang={lang} />
     </>
   );

@@ -279,7 +279,7 @@ export default function ConditionsGallery() {
           if (event.clientX < b.left || event.clientX > b.right || event.clientY < b.top || event.clientY > b.bottom) setDetails(null);
         }}
         data-lenis-prevent
-        className="fixed inset-0 m-auto max-h-[88dvh] w-[calc(100%-2rem)] max-w-2xl overflow-y-auto overscroll-contain rounded-[1.75rem] border border-mist/20 bg-forest-2 p-0 text-white shadow-2xl backdrop:bg-[#082629]/75 backdrop:backdrop-blur-sm"
+        className="modal-dark fixed inset-0 m-auto max-h-[88dvh] w-[calc(100%-2rem)] max-w-2xl overflow-y-auto overscroll-contain rounded-[1.75rem] border border-mist/20 bg-forest-2 p-0 text-white shadow-2xl backdrop:bg-[#082629]/75 backdrop:backdrop-blur-sm"
       >
         {details && (
           <>

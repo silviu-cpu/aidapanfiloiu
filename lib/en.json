@@ -451,5 +451,16 @@
   "Diagramă în secțiune a canalului anal, cu hemoroizi interni, externi și prolabați": "Cross-section diagram of the anal canal showing internal, external and prolapsing haemorrhoids",
   "Diagramă anatomică a canalului anal, cu linia dentată și mușchii sfincterieni intern și extern": "Anatomical diagram of the anal canal showing the dentate line and the internal and external sphincter muscles",
   "Imagine CT în secțiune sagitală a pelvisului": "Sagittal CT image of the pelvis",
-  "Ilustrație 3D a straturilor pielii: epiderm, derm și hipoderm": "3D illustration of the skin layers: epidermis, dermis and hypodermis"
+  "Ilustrație 3D a straturilor pielii: epiderm, derm și hipoderm": "3D illustration of the skin layers: epidermis, dermis and hypodermis",
+  "Se trimite…": "Sending…",
+  "Nu am putut trimite cererea. Te rog încearcă din nou sau sună-mă la": "Your request could not be sent. Please try again or call me on",
+  "Formularul nu este disponibil momentan. Te rog sună-mă la": "The form is not available right now. Please call me on",
+  "Numele nu a fost completat.": "Please enter your name.",
+  "Numele trebuie să aibă minim 3 caractere.": "Your name must be at least 3 characters long.",
+  "Numele poate conține doar litere, spații și cratimă.": "Your name can only contain letters, spaces and hyphens.",
+  "Numărul de telefon nu a fost completat.": "Please enter your phone number.",
+  "Numărul de telefon nu este valid. Exemplu: 0712 345 678.": "This phone number is not valid. Please include your country code, e.g. +44 7911 123456 (or 0712 345 678 for Romanian numbers).",
+  "Adresa de email nu este validă. Exemplu: nume@exemplu.ro.": "This email address is not valid. Example: name@example.com.",
+  "Alege tipul consultației.": "Please choose the type of consultation.",
+  "Ca să te pot suna, e nevoie de acordul tău pentru prelucrarea datelor.": "I need your consent to process your data before I can call you."
 }

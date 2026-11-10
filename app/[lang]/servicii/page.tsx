@@ -1,4 +1,6 @@
-import { translator } from "@/lib/translate";
+import { translator } from "@/lib/translate";
+import { ScrollReveal } from "@/components/ScrollReveal";
+import SectionFade from "@/components/site/SectionFade";
 import type { Metadata } from "next";
 import { SiteHeader } from "@/components/SiteHeader";
 import Footer from "@/components/site/Footer";
@@ -102,9 +104,11 @@ export default async function ServiciiPage({ params }: PageProps<"/[lang]/servic
         </div>
       </section>
 
+      <SectionFade from="surface" to="forest" />
       {/* AFECȚIUNI: GALERIE LA SCROLL */}
       <ConditionsGallery />
 
+      <SectionFade from="forest" to="mist-bg" />
       {/* INVESTIGAȚII: CARTOTECĂ */}
       <section className="overflow-hidden bg-mist-bg py-16 md:py-20">
         <div className="container-x">
@@ -238,6 +242,7 @@ export default async function ServiciiPage({ params }: PageProps<"/[lang]/servic
         </div>
       </section>
 
+      <SectionFade from="deep" to="surface" />
       {/* CTA */}
       <section className="bg-surface py-20">
         <div className="mx-auto flex max-w-3xl flex-col items-center gap-5 px-6 text-center">
@@ -255,6 +260,8 @@ export default async function ServiciiPage({ params }: PageProps<"/[lang]/servic
         </div>
       </section>
       </div>
+      {/* Apariția lină a secțiunilor; rulează după ce pagina e hidratată. */}
+      <ScrollReveal />
       <Footer lang={lang} />
     </>
   );
