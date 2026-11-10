@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { AppointmentLink } from "./site/AppointmentModal";
+import { MobileMenu } from "./MobileMenu";
 import { localePath, nav, type Locale } from "@/lib/i18n";
 
 /** Bara de navigare: o „pastilă” de sticlă care plutește deasupra paginii. */
@@ -12,7 +13,7 @@ export function SiteHeader({ lang, current }: { lang: Locale; current: string })
     <header className="pointer-events-none fixed inset-x-0 top-4 z-50 px-4">
       <nav
         aria-label={t.label}
-        className="pointer-events-auto mx-auto flex max-w-3xl items-center justify-between gap-2 rounded-full border border-white/15 bg-[#0f2629]/60 py-2 pl-3 pr-2 text-white shadow-xl shadow-black/20 backdrop-blur-xl sm:gap-4 sm:pl-5"
+        className="pointer-events-auto relative mx-auto flex max-w-3xl items-center justify-between gap-2 rounded-full border border-white/15 bg-[#0f2629]/60 py-2 pl-3 pr-2 text-white shadow-xl shadow-black/20 backdrop-blur-xl sm:gap-4 sm:pl-5"
       >
         <Link href={localePath(lang, "/")} className="flex items-center gap-2 text-xs font-semibold sm:text-sm">
           <Image src="/brand/logo.svg" width={32} height={32} alt="" aria-hidden="true" className="size-6 shrink-0 sm:size-8" />
@@ -33,14 +34,14 @@ export function SiteHeader({ lang, current }: { lang: Locale; current: string })
           ))}
         </ul>
 
-        <div className="flex items-center gap-1.5">
-          {/* Schimbarea limbii: duce la aceeași pagină în cealaltă limbă */}
+        <div className="flex items-center gap-1">
+          {/* Schimbarea limbii: duce la aceeași pagină în cealaltă limbă. Pe telefon e în meniu. */}
           <Link
             href={localePath(other, current)}
             hrefLang={other}
             lang={other}
             aria-label={t.switchLabel}
-            className="rounded-full px-2 py-2 text-xs font-semibold uppercase text-white/75 transition-colors hover:bg-white/10 hover:text-white sm:px-3"
+            className="hidden rounded-full px-2 py-2 text-xs font-semibold uppercase sm:inline-block text-white/75 transition-colors hover:bg-white/10 hover:text-white sm:px-3"
           >
             {other}
           </Link>
@@ -50,6 +51,15 @@ export function SiteHeader({ lang, current }: { lang: Locale; current: string })
           >
             {t.cta}
           </AppointmentLink>
+          <MobileMenu
+            links={t.links.map((link) => ({
+              href: localePath(lang, link.href),
+              label: link.label,
+              current: link.href === current,
+            }))}
+            language={{ href: localePath(other, current), code: other, label: t.switchLabel, name: t.languageName }}
+            labels={{ open: t.menuOpen, close: t.menuClose, menu: t.label }}
+          />
         </div>
       </nav>
     </header>
