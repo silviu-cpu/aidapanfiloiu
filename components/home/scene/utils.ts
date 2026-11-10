@@ -13,6 +13,9 @@ export type HeroStore = {
   revealedAt: number;
   /** Unde se termină textul de deasupra tăvii, ca fracție din înălțimea ecranului (0 = sus). */
   textBottom: number;
+  /** Pe telefon: unde se termină bara de navigare și unde începe titlul din hero (fracții din înălțime). */
+  heroBandTop: number;
+  heroTextTop: number;
 };
 
 export type Point = [number, number];

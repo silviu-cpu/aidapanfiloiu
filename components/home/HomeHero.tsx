@@ -46,7 +46,8 @@ export function HomeHero({
   const trackRef = useRef<HTMLElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const sceneTwoRef = useRef<HTMLDivElement>(null);
-  const store = useRef<HeroStore>({ progress: 0, pointerX: 0, pointerY: 0, reduced: false, revealedAt: 0, textBottom: 0 });
+  const heroTextRef = useRef<HTMLDivElement>(null);
+  const store = useRef<HeroStore>({ progress: 0, pointerX: 0, pointerY: 0, reduced: false, revealedAt: 0, textBottom: 0, heroBandTop: 0, heroTextTop: 0 });
   const [reduced, setReduced] = useState(false);
   const [active, setActive] = useState(true);
   const [canvasReady, setCanvasReady] = useState(false);
@@ -99,14 +100,21 @@ export function HomeHero({
     const stage = stageRef.current;
     const text = sceneTwoRef.current;
     if (!stage || !text) return;
+    const heroText = heroTextRef.current;
     const measure = () => {
       const height = stage.clientHeight;
-      store.current.textBottom = height ? (text.offsetTop + text.offsetHeight) / height : 0;
+      if (!height) return;
+      store.current.textBottom = (text.offsetTop + text.offsetHeight) / height;
+      // Pe telefon, pensa din hero stă între bara de navigare și titlu.
+      const bar = document.querySelector("header nav")?.getBoundingClientRect();
+      store.current.heroBandTop = bar ? bar.bottom / height : 0;
+      store.current.heroTextTop = heroText ? heroText.offsetTop / height : 0;
     };
     measure();
     const ro = new ResizeObserver(measure);
     ro.observe(stage);
     ro.observe(text);
+    if (heroText) ro.observe(heroText);
     return () => ro.disconnect();
   }, [reduced, store]);
 
@@ -210,17 +218,17 @@ export function HomeHero({
           {/* Scena 1: textul din hero */}
           <div
             data-hero-s1
-            className="pointer-events-none relative z-10 mx-auto flex h-full max-w-7xl flex-col justify-end px-5 pb-20 sm:px-8 md:justify-center md:pb-0"
+            className="pointer-events-none relative z-10 mx-auto flex h-full max-w-7xl flex-col justify-end px-5 pb-12 sm:px-8 sm:pb-20 md:justify-center md:pb-0"
           >
-            <div className="pointer-events-auto max-w-2xl">
+            <div ref={heroTextRef} className="pointer-events-auto max-w-2xl">
               <h1 id="hero-title" className="text-4xl font-bold leading-[1.05] tracking-tight sm:text-5xl lg:text-[3.5rem]">
                 {copy.titleA}
                 <span className="block font-semibold text-[#a9dcd9]">{copy.titleB}</span>
               </h1>
-              <p className="mt-5 max-w-md text-base leading-relaxed text-white/75">{copy.lead}</p>
+              <p className="mt-4 max-w-md text-base leading-relaxed text-white/75 sm:mt-5">{copy.lead}</p>
 
               {/* Specialitățile se dezvăluie pe rând, literă cu literă. */}
-              <ul data-specialties className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-3 text-sm font-medium text-white/85">
+              <ul data-specialties className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-3 text-sm font-medium text-white/85">
                 {copy.pills.map((label, i) => (
                   <li key={label} className="flex items-center gap-5">
                     {i > 0 && <span aria-hidden="true" className="hidden h-4 w-px bg-white/20 sm:block" />}
@@ -242,7 +250,7 @@ export function HomeHero({
                 ))}
               </ul>
 
-              <div className="mt-8 flex flex-wrap gap-3">
+              <div className="mt-6 flex flex-wrap gap-3 sm:mt-8">
                 <AppointmentLink
                   href={contactHref}
                   className="rounded-full bg-white px-6 py-3 text-sm font-semibold text-ink shadow-lg shadow-black/20 transition-transform hover:-translate-y-0.5"

@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { ScrollReveal } from "@/components/ScrollReveal";
+import SectionFade from "@/components/site/SectionFade";
 import { HomeHero, type HeroCopy } from "@/components/home/HomeHero";
 import { SiteHeader } from "@/components/SiteHeader";
 import Footer from "@/components/site/Footer";
@@ -63,9 +65,12 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
         conditionsHref={localePath(lang, "/servicii")}
       />
 
+      <SectionFade from="hero" to="surface-lowest" />
       <div className="site-page">
         <HomeSections lang={lang} />
       </div>
+      {/* Apariția lină a secțiunilor; rulează după ce pagina e hidratată. */}
+      <ScrollReveal />
       <Footer lang={lang} />
     </>
   );

@@ -44,6 +44,7 @@ export default function ExperienceTimeline({ items }: { items: ExperienceItem[] 
       distance = Math.max(0, list.scrollHeight - viewport.clientHeight + 12);
       if (pinned) setHeight(window.innerHeight + Math.max(items.length * 420, window.innerHeight * 3));
     };
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const onScroll = () => {
       cancelAnimationFrame(frame);
       frame = requestAnimationFrame(() => {
@@ -55,12 +56,21 @@ export default function ExperienceTimeline({ items }: { items: ExperienceItem[] 
         const positions = dotRefs.current.map((dot) => dot ? dot.offsetTop + (dot.offsetParent as HTMLElement).offsetTop + 8 : 0);
         const start = positions[0] ?? 12;
         const end = positions[positions.length - 1] ?? start;
-        const reached = start + (end - start) * progress;
+        // Fixată (desktop): linia urmează progresul secțiunii.
+        // Pe telefon: linia ajunge până la punctul aflat la ~65% din înălțimea ecranului,
+        // deci se umple pe măsură ce derulezi. Cu „mișcare redusă” e plină de la început.
+        const target = pinned
+          ? start + (end - start) * progress
+          : reduced
+            ? end
+            : Math.min(end, window.innerHeight * 0.65 - list.getBoundingClientRect().top);
+        const reached = Math.max(start, target);
         if (fillRef.current) {
           fillRef.current.style.top = `${start}px`;
           fillRef.current.style.height = `${reached - start}px`;
         }
-        setLit(positions.filter((position) => position <= reached + 0.5).length);
+        // Prima bulină se aprinde abia când linia ajunge la ea, nu înainte să apară pe ecran.
+        setLit(positions.filter((position) => position <= target + 0.5).length);
       });
     };
     const resize = () => { measure(); onScroll(); };
@@ -81,9 +91,8 @@ export default function ExperienceTimeline({ items }: { items: ExperienceItem[] 
   }, [items.length, pinned]);
 
   return (
-    <section ref={sectionRef} className="relative bg-forest text-white" style={pinned && height ? { height } : undefined} aria-labelledby="experience-title">
+    <section ref={sectionRef} data-reveal-skip className="relative bg-forest text-white" style={pinned && height ? { height } : undefined} aria-labelledby="experience-title">
       <div className={pinned ? "sticky top-0 flex h-screen flex-col overflow-hidden px-6 pb-12 pt-24" : "relative overflow-hidden px-6 py-24"}>
-        <div aria-hidden className="dot-grid pointer-events-none absolute inset-0 opacity-[0.06]" />
         <div className="relative mx-auto flex min-h-0 w-full max-w-4xl flex-1 flex-col">
           <div className="shrink-0 pb-10">
             <h2 id="experience-title" className="mb-3 text-4xl text-white md:text-5xl">{t("Experiență profesională")}</h2>

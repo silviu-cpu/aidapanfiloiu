@@ -1,4 +1,5 @@
-import { translator } from "@/lib/translate";
+import { translator } from "@/lib/translate";
+import SectionFade from "@/components/site/SectionFade";
 import { localePath, type Locale } from "@/lib/i18n";
 import Link from "next/link";
 import Photo from "@/components/site/Photo";
@@ -152,7 +153,8 @@ export default function HomeSections({ lang }: { lang: Locale }) {
     <>
       {/* HIGHLIGHTS */}
       <section className="bg-surface-lowest py-10">
-        <div className="container-x grid grid-cols-2 gap-4 md:grid-cols-4">
+        {/* Pe telefon câte un card pe rând: titlurile lungi („Laparoscopie”) nu încap pe jumătate de ecran. */}
+        <div className="container-x grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4">
           {highlights.map((h) => (
             <div key={h.value} className="flex flex-col rounded-3xl bg-surface-low/60 p-5">
               <span className="font-heading text-3xl text-primary md:text-4xl">{t(h.value)}</span>
@@ -275,7 +277,6 @@ export default function HomeSections({ lang }: { lang: Locale }) {
 
       {/* RECENZII: se schimbă singure, cu animație. TODO: înlocuite cu recenzii reale, cu acordul pacienților. */}
       <section className="relative overflow-hidden bg-deep-2 py-20">
-        <div className="dot-grid pointer-events-none absolute inset-0 opacity-15" />
         <div className="relative mx-auto max-w-4xl px-6 text-center">
           <TestimonialCarousel
             items={testimonials.map((item) => ({ text: t(item.text), author: t(item.author), role: t(item.role) }))}
@@ -325,6 +326,7 @@ export default function HomeSections({ lang }: { lang: Locale }) {
         </div>
       </section>
 
+      <SectionFade from="deep-2" to="surface-lowest" />
       {/* FAQ */}
       <section className="bg-surface-lowest py-16 md:py-20" id="intrebari">
         <div className="mx-auto flex max-w-3xl flex-col gap-8 px-6">

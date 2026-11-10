@@ -59,7 +59,11 @@ const tmp = {
   camTarget: new THREE.Vector3(),
   lookEnd: new THREE.Vector3(),
   fit: new THREE.Matrix4(),
+  heroPos: new THREE.Vector3(),
 };
+
+/** Cât de înaltă apare pensa în hero, raportat la scara ei (unități de lume, cu tot cu înclinare). */
+const GRASPER_HERO_HEIGHT = 1.9;
 
 /** Colțurile tăvii (cu tot cu margine), în lume, ca să știm cât ocupă pe ecran. */
 function trayCorners(portrait: boolean) {
@@ -120,7 +124,7 @@ export function Scene({ store }: { store: RefObject<HeroStore> }) {
       trayTop = Math.max(trayTop, y);
       trayBottom = Math.min(trayBottom, y);
     }
-    return { heroPos, heroScale, heroTilt, dist, lookOffset, trayTop, trayBottom };
+    return { h0, heroPos, heroScale, heroTilt, dist, lookOffset, trayTop, trayBottom };
   }, [aspect, portrait]);
 
   useEffect(() => {
@@ -169,7 +173,17 @@ export function Scene({ store }: { store: RefObject<HeroStore> }) {
     tmp.hover.copy(tmp.end).addScaledVector(tmp.up, HOVER);
 
     // Poziția din hero, cu plutire și reacție la mouse.
-    tmp.start.copy(layout.heroPos);
+    // Pe telefon, pensa se așază în spațiul liber dintre bara de navigare și titlu,
+    // și se micșorează dacă spațiul e mic, ca să nu treacă peste text.
+    let heroScale = layout.heroScale;
+    tmp.heroPos.copy(layout.heroPos);
+    if (portrait && st.heroTextTop > st.heroBandTop && st.heroTextTop > 0) {
+      const top = (0.5 - Math.max(st.heroBandTop, 0.08)) * layout.h0;
+      const bottom = (0.5 - st.heroTextTop) * layout.h0;
+      tmp.heroPos.set(0, (top + bottom) / 2, 0);
+      heroScale = Math.max(0.3, Math.min(heroScale, ((top - bottom) * 0.85) / GRASPER_HERO_HEIGHT));
+    }
+    tmp.start.copy(tmp.heroPos);
     tmp.start.y += Math.sin(time * 0.9) * 0.08 * idle - enter * 2.2;
     tmp.euler.set(
       0.22 - tmp.pointer.y * 0.14,
@@ -203,7 +217,7 @@ export function Scene({ store }: { store: RefObject<HeroStore> }) {
     tmp.qRoll.setFromAxisAngle(X_AXIS, Math.PI * 2 * turn - enter * 2.4);
     g.quaternion.slerpQuaternions(tmp.qStart, tmp.qEnd, turn).multiply(tmp.qRoll);
     g.scale.setScalar(
-      lerp(layout.heroScale * lerp(1, 0.7, enter), 1, easeOutCubic(range(p, T.flyStart, T.flyEnd))),
+      lerp(heroScale * lerp(1, 0.7, enter), 1, easeOutCubic(range(p, T.flyStart, T.flyEnd))),
     );
 
     // Fălcile „respiră” în hero și se închid în timpul zborului.
