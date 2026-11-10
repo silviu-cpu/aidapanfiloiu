@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata } from "next";
 import { ScrollReveal } from "@/components/ScrollReveal";
 import SectionFade from "@/components/site/SectionFade";
 import { HomeHero, type HeroCopy } from "@/components/home/HomeHero";
@@ -19,6 +19,7 @@ const hero: Record<Locale, HeroCopy> = {
     doctorNote: "Peste 10 ani de practică în chirurgie generală",
     doctorPhoto: "/images/dr-aida-panfiloiu-cv.png",
     pills: ["Chirurgie generală", "Laparoscopie", "Proctologie"],
+    stampLines: ["Medic specialist", "Chirurgie generală"],
     scroll: "Scroll",
     s2Eyebrow: "Chirurgie minim-invazivă",
     s2Title: "Fiecare intervenție, pregătită la milimetru.",
@@ -35,6 +36,7 @@ const hero: Record<Locale, HeroCopy> = {
     doctorNote: "Over 10 years of practice in general surgery",
     doctorPhoto: "/images/dr-aida-panfiloiu-cv.png",
     pills: ["General surgery", "Laparoscopy", "Proctology"],
+    stampLines: ["Specialist doctor", "General surgery"],
     scroll: "Scroll",
     s2Eyebrow: "Minimally invasive surgery",
     s2Title: "Every procedure, prepared to the millimetre.",

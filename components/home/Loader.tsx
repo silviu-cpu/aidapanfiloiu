@@ -1,110 +1,137 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { SIGNATURE_HEIGHT, SIGNATURE_PATHS, SIGNATURE_WIDTH } from "./signature";
 
 type Phase = "drawing" | "waiting" | "leaving" | "gone";
 
-/** Cât durează desenul, cât mai așteptăm scena 3D după el și cât ține ieșirea. */
-const DRAW_MS = 3400;
+/** Cât durează umplerea semnăturii, bucla de la final, cât mai așteptăm scena 3D și cât ține ieșirea. */
+const FILL_MS = 1600;
+const KNOT_MS = 550;
+/** Cât durează ștampila: coborâre, apăsare, ridicare. */
+const STAMP_MS = 1100;
 const MAX_WAIT_MS = 4000;
-const HOLD_MS = 250;
+const HOLD_MS = 350;
 const EXIT_MS = 800;
 
-/** Cerc ca drum SVG din două semicercuri (un singur arc de 360° se măsoară greșit în browser). */
-const circle = (cx: number, cy: number, r: number) =>
-  `M${cx} ${cy - r}A${r} ${r} 0 1 1 ${cx} ${cy + r}A${r} ${r} 0 1 1 ${cx} ${cy - r}`;
+/** Bucla de la finalul semnăturii, desenată față de ultimul ei punct. */
+const KNOT = "M0 0C26 -44 86 -40 70 4C58 38 8 26 22 -6C34 -34 74 -30 104 -8";
 
-/** Brațele robotului: prinderea pe consolă → cot → suportul instrumentului → punctul de intrare. */
-const ARMS = [
-  { pivot: [124, 46], elbow: [110, 80], holder: [152, 104], port: [198, 141] },
-  { pivot: [164, 46], elbow: [154, 78], holder: [180, 106], port: [207, 142] },
-  { pivot: [204, 46], elbow: [218, 78], holder: [224, 106], port: [215, 142] },
-  { pivot: [244, 46], elbow: [262, 82], holder: [252, 108], port: [224, 141] },
-];
+const clamp01 = (x: number) => Math.min(1, Math.max(0, x));
+/** Pornește direct, curge constant și încetinește puțin spre final. */
+const ease = (t: number) => 1 - Math.pow(1 - t, 1.5);
 
 /**
- * Robot chirurgical cu mai multe brațe (sistem de tip da Vinci), desenat ca o schiță tehnică.
- * E un desen generic, fără designul sau sigla vreunui producător.
- * Piesele se trasează pe rând, în ordinea în care e „asamblat” robotul.
- */
-const PARTS = [
-  // Podeaua
-  "M16 196H304",
-  // Căruciorul, roțile și coloana
-  "M36 172H92Q98 172 98 178V184Q98 190 92 190H36Q30 190 30 184V178Q30 172 36 172Z",
-  `${circle(44, 193, 3.5)}${circle(84, 193, 3.5)}`,
-  "M56 172V46Q56 38 64 38H66Q72 38 72 46V172M56 120H72M56 128H72",
-  // Consola de sus, din care atârnă brațele
-  "M60 34H262Q268 34 268 40Q268 46 262 46H60",
-  circle(64, 40, 7),
-  // Masa de operație și pacientul acoperit cu câmp steril
-  "M128 150H300M214 150V188M192 188H236",
-  "M136 150Q146 132 172 134H262Q288 134 296 150",
-  // Cele patru brațe, cu articulațiile lor
-  ...ARMS.flatMap(({ pivot, elbow, holder }) => [
-    `M${pivot.join(" ")}L${elbow.join(" ")}L${holder.join(" ")}`,
-    `${circle(pivot[0], pivot[1] + 3, 3.5)}${circle(elbow[0], elbow[1], 3.5)}${circle(holder[0], holder[1], 2.5)}`,
-  ]),
-  // Instrumentele, care se întâlnesc în punctul de lucru
-  ...ARMS.map(({ holder, port }) => `M${holder.join(" ")}L${port.join(" ")}`),
-];
-
-/** Fiecare piesă începe puțin după cea dinainte; ultima se termină exact la 100. */
-const partProgress = (p: number, i: number) =>
-  Math.min(1, Math.max(0, (p - (i / (PARTS.length - 1)) * 0.64) / 0.36));
-
-/** Ritmul desenului: pornește direct, curge constant și încetinește puțin spre final. */
-const ease = (t: number) => 1 - Math.pow(1 - t, 1.6);
-
-/**
- * Ecranul de încărcare, în două etape:
- * 1. robotul se desenează, fără nimic greu în paralel, ca liniile să curgă fluid;
- * 2. abia apoi se încarcă scena 3D, cât desenul stă complet pe ecran, și loader-ul pleacă.
+ * Ecranul de încărcare: semnătura doamnei doctor apare direct, întreagă, ca un contur, și se
+ * umple de culoare literă cu literă, de la stânga la dreapta; urmează bucla de la final, apoi
+ * ștampila coboară și aplică parafa. După ce s-a încărcat scena 3D, loader-ul pleacă.
  */
 export function Loader({
   ready,
   reduced,
   label,
-  note,
+  stamp,
   onDrawn,
   onDone,
 }: {
   ready: boolean;
   reduced: boolean;
   label: string;
-  note: string;
+  /** Parafa care se „aplică” lângă semnătură: numele și specialitatea, fără cod. */
+  stamp: { name: string; lines: [string, string] };
   onDrawn: () => void;
   onDone: () => void;
 }) {
   const [phase, setPhase] = useState<Phase>("drawing");
-  const paths = useRef<(SVGPathElement | null)[]>([]);
-  const counter = useRef<HTMLParagraphElement>(null);
-  const bar = useRef<HTMLDivElement>(null);
+  const main = useRef<(SVGPathElement | null)[]>([]);
+  const glow = useRef<(SVGPathElement | null)[]>([]);
+  const knot = useRef<SVGPathElement>(null);
+  const parafa = useRef<HTMLDivElement>(null);
+  const stampTool = useRef<HTMLDivElement>(null);
+  const stampShadow = useRef<HTMLDivElement>(null);
   const callbacks = useRef({ onDrawn, onDone });
 
   useEffect(() => {
     callbacks.current = { onDrawn, onDone };
   });
 
-  // Etapa 1: desenul. Elementele se modifică direct, fără re-randări React la fiecare cadru.
+  // Etapa 1: semnătura, apoi ștampila. Elementele se modifică direct, fără re-randări React la fiecare cadru.
   useEffect(() => {
-    const duration = reduced ? 600 : DRAW_MS;
+    const paths = main.current.filter((p): p is SVGPathElement => !!p);
+    const lengths = paths.map((p) => p.getTotalLength());
+    const total = lengths.reduce((a, b) => a + b, 0);
+    const starts = lengths.map((_, i) => lengths.slice(0, i).reduce((a, b) => a + b, 0));
+    const filled = new Array(paths.length).fill(false);
+
+    // Conturul semnăturii apare direct, întreg.
+    paths.forEach((path, i) => {
+      path.style.strokeDashoffset = "0";
+      const g = glow.current[i];
+      if (g) g.style.strokeDashoffset = "0";
+    });
+
+    // Bucla pornește din ultimul punct al semnăturii.
+    const last = paths.length - 1;
+    const endPoint = last >= 0 ? paths[last].getPointAtLength(lengths[last]) : { x: SIGNATURE_WIDTH, y: SIGNATURE_HEIGHT * 0.6 };
+    knot.current?.setAttribute("transform", `translate(${endPoint.x} ${endPoint.y})`);
+
+    // Ordinea: umplerea semnăturii, bucla, apoi ștampila cu parafa.
+    const fillMs = reduced ? 0 : FILL_MS;
+    const stampStart = fillMs + KNOT_MS * 0.7;
+    const endMs = reduced ? 0 : stampStart + STAMP_MS;
     let raf = 0;
     let start = 0;
 
     const step = (now: number) => {
       if (!start) start = now;
-      const t = Math.min(1, (now - start) / duration);
-      const p = ease(t);
-      paths.current.forEach((el, i) => {
-        if (el) el.style.strokeDashoffset = String(1 - partProgress(p, i % PARTS.length));
-      });
-      if (counter.current) counter.current.textContent = String(Math.round(p * 100)).padStart(2, "0");
-      if (bar.current) bar.current.style.transform = `scaleX(${p})`;
+      const elapsed = now - start;
 
-      if (t < 1) {
+      // 1) Literele se umplu de cerneală pe rând, de la stânga la dreapta (tranziția e pe fill-opacity).
+      const reached = (reduced ? 1 : ease(clamp01(elapsed / fillMs))) * total;
+      paths.forEach((path, i) => {
+        if (!filled[i] && reached >= starts[i] + lengths[i] * 0.5) {
+          filled[i] = true;
+          path.style.fillOpacity = "0.95";
+        }
+      });
+
+      // 2) Bucla de la finalul semnăturii.
+      if (!reduced && elapsed >= fillMs && knot.current) {
+        knot.current.style.strokeDashoffset = String(1 - clamp01((elapsed - fillMs) / KNOT_MS));
+      }
+
+      // 3) Ștampila: coboară, apasă (parafa apare la impact), apoi se ridică și dispare.
+      if (reduced) {
+        parafa.current?.classList.add("is-stamped");
+      } else {
+        // Se calculează la fiecare cadru, ca să ajungă sigur în poziția finală (ascunsă),
+        // chiar dacă browserul sare peste cadre.
+        const s = clamp01((elapsed - stampStart) / STAMP_MS);
+        const tool = stampTool.current;
+        if (tool) {
+          const down = 1 - Math.pow(1 - clamp01(s / 0.4), 2.2);
+          const up = s > 0.6 ? Math.pow(clamp01((s - 0.6) / 0.4), 2) : 0;
+          const squish = s > 0.4 && s < 0.6 ? Math.sin(((s - 0.4) / 0.2) * Math.PI) * 0.06 : 0;
+          const lift = (1 - down) * 160 + up * 180;
+          tool.style.setProperty("--lift", `${lift.toFixed(1)}px`);
+          tool.style.setProperty("--squish", (1 - squish).toFixed(3));
+          const visible = Math.min(clamp01(s / 0.12), 1 - clamp01((s - 0.78) / 0.22));
+          tool.style.opacity = String(visible);
+          // Umbra: cu cât ștampila e mai jos, cu atât umbra e mai mică și mai închisă.
+          const near = 1 - lift / 180;
+          const shadow = stampShadow.current;
+          if (shadow) {
+            shadow.style.opacity = String(clamp01(near) * 0.8 * visible);
+            shadow.style.transform = `scale(${(1.35 - clamp01(near) * 0.4).toFixed(3)})`;
+          }
+        }
+        if (s >= 0.44) parafa.current?.classList.add("is-stamped");
+      }
+
+      if (elapsed < endMs) {
         raf = requestAnimationFrame(step);
       } else {
+        parafa.current?.classList.add("is-stamped");
         setPhase("waiting");
         callbacks.current.onDrawn();
       }
@@ -113,8 +140,7 @@ export function Loader({
     return () => cancelAnimationFrame(raf);
   }, [reduced]);
 
-  // Cât timp loader-ul acoperă ecranul, pagina de dedesubt nu se mai desenează
-  // (efectele de sticlă de sub el ar încetini animația).
+  // Cât timp loader-ul acoperă ecranul, pagina de dedesubt nu se mai desenează.
   useEffect(() => {
     if (phase === "leaving" || phase === "gone") return;
     const html = document.documentElement;
@@ -147,55 +173,151 @@ export function Loader({
     <div
       role="status"
       aria-live="polite"
-      className={`site-loader hero-bg fixed inset-0 z-[70] flex flex-col items-center justify-center text-white transition-[opacity,transform] duration-[800ms] ease-[cubic-bezier(0.7,0,0.2,1)] ${
+      className={`site-loader hero-bg fixed inset-0 z-[70] flex flex-col items-center justify-center px-6 text-white transition-[opacity,transform] duration-[800ms] ease-[cubic-bezier(0.7,0,0.2,1)] ${
         phase === "leaving" ? "pointer-events-none -translate-y-6 opacity-0" : ""
       }`}
     >
       <span className="sr-only">{label}</span>
 
+      <div className="relative w-[min(86vw,640px)]">
       <svg
-        viewBox="10 26 300 176"
-        className={`w-[min(84vw,460px)] overflow-visible ${phase === "waiting" ? "loader-wait" : ""}`}
+        viewBox={`0 0 ${SIGNATURE_WIDTH} ${SIGNATURE_HEIGHT}`}
+        className={`w-full overflow-visible ${phase === "waiting" ? "loader-wait" : ""}`}
         fill="none"
-        stroke="#8fe6ea"
         strokeLinecap="round"
         strokeLinejoin="round"
         aria-hidden="true"
       >
-        {/* Strălucirea: aceleași linii, mai late și transparente (mai ieftin decât un filtru CSS) */}
-        {[
-          { width: 4, opacity: 0.14 },
-          { width: 1.15, opacity: 1 },
-        ].map((layer, l) => (
-          <g key={l} strokeWidth={layer.width} strokeOpacity={layer.opacity}>
-            {PARTS.map((d, i) => (
-              <path
-                key={i}
-                ref={(el) => {
-                  paths.current[l * PARTS.length + i] = el;
-                }}
-                d={d}
-                pathLength={1}
-                strokeDasharray="1 2"
-                strokeDashoffset={1}
-              />
-            ))}
-          </g>
-        ))}
+        {/* Strălucirea: aceleași litere, cu linie lată și transparentă (mai ieftin decât un filtru CSS) */}
+        <g stroke="#8fe6ea" strokeOpacity={0.16}>
+          {SIGNATURE_PATHS.map((d, i) => (
+            <path
+              key={`g${i}`}
+              ref={(el) => {
+                glow.current[i] = el;
+              }}
+              d={d}
+              pathLength={1}
+              strokeDasharray="1 2"
+              strokeDashoffset={1}
+              strokeWidth={5}
+              vectorEffect="non-scaling-stroke"
+            />
+          ))}
+        </g>
+
+        {/* Firul: conturul literelor, care apoi se umple */}
+        <g stroke="#8fe6ea" fill="#d9f5f3">
+          {SIGNATURE_PATHS.map((d, i) => (
+            <path
+              key={`m${i}`}
+              ref={(el) => {
+                main.current[i] = el;
+              }}
+              d={d}
+              pathLength={1}
+              strokeDasharray="1 2"
+              strokeDashoffset={1}
+              strokeWidth={1.1}
+              vectorEffect="non-scaling-stroke"
+              style={{ fillOpacity: 0, transition: "fill-opacity 0.6s ease" }}
+            />
+          ))}
+        </g>
+
+        {/* Bucla de la final */}
+        <path
+          ref={knot}
+          d={KNOT}
+          stroke="#8fe6ea"
+          strokeWidth={1.1}
+          vectorEffect="non-scaling-stroke"
+          pathLength={1}
+          strokeDasharray="1 2"
+          strokeDashoffset={1}
+        />
+
       </svg>
 
-      <div className="mt-10 flex w-[min(84vw,460px)] items-end justify-between gap-6">
-        <div>
-          <p className="text-sm font-semibold tracking-tight">Dr. Aida Panfiloiu</p>
-          <p className="mt-1 text-[11px] uppercase tracking-[0.16em] text-white/50">{note}</p>
+        {/* Parafa sub nume, iar deasupra ei ștampila care coboară, apasă și pleacă */}
+        {/* Destul de jos încât ștampila, când apasă, să nu acopere semnătura. */}
+        <div aria-hidden="true" className="absolute -bottom-36 right-[2%] sm:-bottom-[11.5rem]">
+          <div
+            ref={parafa}
+            className="parafa rounded-[10px] border-[3px] border-double border-[#8fe6ea]/80 px-4 py-2 text-center font-serif leading-tight text-[#8fe6ea]/85"
+          >
+            <p className="text-[13px] font-medium sm:text-sm">{stamp.name}</p>
+            <p className="mt-0.5 text-[11px] sm:text-xs">{stamp.lines[0]}</p>
+            <p className="text-[11px] sm:text-xs">{stamp.lines[1]}</p>
+          </div>
+
+          {!reduced && (
+            <>
+              {/* Umbra ștampilei pe „hârtie”: se strânge și se închide la culoare când ștampila coboară */}
+              <div
+                ref={stampShadow}
+                className="pointer-events-none absolute inset-x-[2%] -bottom-2 h-5 rounded-[50%] bg-black/60 blur-md"
+                style={{ opacity: 0 }}
+              />
+              <div
+                ref={stampTool}
+                className="pointer-events-none absolute inset-x-[2%] bottom-0 origin-bottom"
+                style={{ opacity: 0, transform: "translateY(calc(-1 * var(--lift, 160px))) scaleY(var(--squish, 1))" }}
+              >
+                {/* Ștampila de parafă cu mâner de lemn, văzută ușor de sus */}
+                <svg viewBox="0 0 220 190" className="w-full overflow-visible drop-shadow-[0_10px_18px_rgba(0,0,0,0.35)]">
+                  <defs>
+                    <linearGradient id="stamp-wood" x1="0" x2="1">
+                      <stop offset="0" stopColor="#5d3a24" />
+                      <stop offset="0.35" stopColor="#a8714a" />
+                      <stop offset="0.6" stopColor="#8c5a38" />
+                      <stop offset="1" stopColor="#4a2d1b" />
+                    </linearGradient>
+                    <linearGradient id="stamp-metal" x1="0" x2="1">
+                      <stop offset="0" stopColor="#7c8a8f" />
+                      <stop offset="0.4" stopColor="#f1f5f6" />
+                      <stop offset="0.7" stopColor="#b9c4c8" />
+                      <stop offset="1" stopColor="#6c797d" />
+                    </linearGradient>
+                    <linearGradient id="stamp-base" x1="0" x2="0" y1="0" y2="1">
+                      <stop offset="0" stopColor="#3a2617" />
+                      <stop offset="1" stopColor="#21150c" />
+                    </linearGradient>
+                    <radialGradient id="stamp-knob" cx="0.38" cy="0.32" r="0.75">
+                      <stop offset="0" stopColor="#c48a5f" />
+                      <stop offset="0.55" stopColor="#8c5a38" />
+                      <stop offset="1" stopColor="#4a2d1b" />
+                    </radialGradient>
+                  </defs>
+                  {/* Mânerul (ciuperca de lemn) */}
+                  <ellipse cx="110" cy="30" rx="36" ry="24" fill="url(#stamp-knob)" />
+                  <ellipse cx="100" cy="20" rx="12" ry="6" fill="#f3d2b4" opacity="0.35" />
+                  {/* Gâtul și inelul metalic */}
+                  <path d="M96 48Q96 60 92 92H128Q124 60 124 48Z" fill="url(#stamp-wood)" />
+                  <rect x="88" y="88" width="44" height="10" rx="2" fill="url(#stamp-metal)" />
+                  {/* Talpa de lemn: fața de sus (mai deschisă) și fața din față */}
+                  <path d="M22 112L44 98H176L198 112Z" fill="#7a4f31" />
+                  <path d="M22 112H198V150H22Z" fill="url(#stamp-base)" />
+                  <path d="M22 112H198" stroke="#a8714a" strokeWidth="1.5" opacity="0.7" />
+                  {/* Cauciucul cu cerneală */}
+                  <rect x="26" y="150" width="168" height="12" rx="1.5" fill="#141b1c" />
+                  <rect x="26" y="160" width="168" height="2.5" fill="#8fe6ea" opacity="0.85" />
+                </svg>
+              </div>
+            </>
+          )}
         </div>
-        <p ref={counter} className="font-serif text-4xl tabular-nums leading-none text-[#a9dcd9]" aria-hidden="true">
-          00
-        </p>
       </div>
-      <div className="mt-4 h-px w-[min(84vw,460px)] overflow-hidden bg-white/10" aria-hidden="true">
-        <div ref={bar} className="h-full origin-left bg-[#8fe6ea]" style={{ transform: "scaleX(0)" }} />
-      </div>
+
+      {/* Cerneala neuniformă a parafei: margini ușor zimțate și pete mai deschise */}
+      <svg width="0" height="0" className="absolute" aria-hidden="true">
+        <filter id="parafa-ink">
+          <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" seed="7" result="noise" />
+          <feDisplacementMap in="SourceGraphic" in2="noise" scale="1.8" xChannelSelector="R" yChannelSelector="G" result="rough" />
+          <feColorMatrix in="noise" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -1 1.35" result="speckle" />
+          <feComposite in="rough" in2="speckle" operator="in" />
+        </filter>
+      </svg>
     </div>
   );
 }

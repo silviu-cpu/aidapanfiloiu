@@ -23,8 +23,10 @@ export type HeroCopy = {
   doctorNote: string;
   /** Fotografia doamnei doctor, afișată mic lângă nume. */
   doctorPhoto: string;
-  /** Specialitățile, afișate sub descriere (și în loader). */
+  /** Specialitățile, afișate sub descriere. */
   pills: [string, string, string];
+  /** Rândurile de sub nume de pe parafa din loader. */
+  stampLines: [string, string];
   scroll: string;
   s2Eyebrow: string;
   s2Title: string;
@@ -195,7 +197,7 @@ export function HomeHero({
         ready={canvasReady}
         reduced={reduced}
         label={copy.loading}
-        note={copy.pills.join(" · ")}
+        stamp={{ name: copy.doctorName, lines: copy.stampLines }}
         onDrawn={() => setDrawn(true)}
         onDone={() => {
           store.current.revealedAt = performance.now();
