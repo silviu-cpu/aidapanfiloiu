@@ -23,6 +23,8 @@ export default function InvestigationsFile() {
   const ref = useRef<HTMLDivElement>(null);
   const uid = useId();
   const [active, setActive] = useState(0);
+  // Pe telefon: fișa deschisă (sau niciuna). Atingerea fișei deschise o închide la loc.
+  const [open, setOpen] = useState<number | null>(0);
   const [shown, setShown] = useState(false);
   // După intrarea în ecran, fișele răspund imediat la hover (fără întârzierea de la intrare).
   const [settled, setSettled] = useState(false);
@@ -103,7 +105,7 @@ export default function InvestigationsFile() {
       {/* Telefon: sertarul cu dosare */}
       <div className="flex flex-col md:hidden" role="group" aria-label={t("Investigații")}>
         {investigations.map((inv, i) => {
-          const isActive = i === active;
+          const isActive = i === open;
           const panelId = `${uid}-inv-${i}`;
           return (
             <div
@@ -131,7 +133,7 @@ export default function InvestigationsFile() {
               >
                 <button
                   type="button"
-                  onClick={() => setActive(i)}
+                  onClick={() => setOpen((current) => (current === i ? null : i))}
                   aria-expanded={isActive}
                   aria-controls={panelId}
                   className="flex w-full items-center gap-2 px-5 py-4 text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"

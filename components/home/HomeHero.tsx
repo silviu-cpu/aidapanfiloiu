@@ -54,10 +54,18 @@ export function HomeHero({
   // Scena 3D se încarcă abia după ce s-a desenat loader-ul, ca desenul să nu sacadeze.
   const [drawn, setDrawn] = useState(false);
   const [loaded, setLoaded] = useState(false);
+  // Devine true după ce loader-ul a ieșit complet; abia atunci pornesc lucrurile grele.
+  const [entered, setEntered] = useState(false);
 
-  // Cât timp e loader-ul pe ecran, pagina nu se poate derula și pornește mereu de sus.
   useEffect(() => {
-    if (loaded) return;
+    if (!loaded) return;
+    const id = window.setTimeout(() => setEntered(true), 750);
+    return () => window.clearTimeout(id);
+  }, [loaded]);
+
+  // Cât timp e loader-ul pe ecran (și cât iese), pagina nu se poate derula și pornește mereu de sus.
+  useEffect(() => {
+    if (entered) return;
     const html = document.documentElement;
     history.scrollRestoration = "manual";
     window.scrollTo(0, 0);
@@ -65,7 +73,7 @@ export function HomeHero({
     return () => {
       html.style.overflow = "";
     };
-  }, [loaded]);
+  }, [entered]);
 
   // După loader: textul din hero urcă rând cu rând.
   useEffect(() => {
@@ -77,10 +85,11 @@ export function HomeHero({
         duration: 1,
         ease: "power3.out",
         stagger: 0.08,
-        delay: 0.25,
+        // Textul urcă după ce loader-ul s-a stins în mare parte.
+        delay: 0.4,
         clearProps: "transform,opacity,visibility",
       });
-      const specialties = gsap.timeline({ delay: 0.6 });
+      const specialties = gsap.timeline({ delay: 0.75 });
       trackRef.current?.querySelectorAll("[data-specialty]").forEach((specialty) => {
         specialties.from(specialty.querySelectorAll("[data-letter]"), {
           yPercent: 110,
@@ -151,8 +160,9 @@ export function HomeHero({
   }, []);
 
   // Scroll lin (Lenis) + cronologia legată de scroll (GSAP ScrollTrigger).
+  // Pornesc după ieșirea loader-ului: măsurarea paginii nu mai încurcă tranziția.
   useEffect(() => {
-    if (reduced || !loaded) return;
+    if (reduced || !entered) return;
     const st = store.current;
     gsap.registerPlugin(ScrollTrigger);
 
@@ -189,7 +199,7 @@ export function HomeHero({
       lenis.destroy();
       st.progress = 0;
     };
-  }, [reduced, loaded, store]);
+  }, [reduced, entered, store]);
 
   return (
     <>
@@ -200,7 +210,8 @@ export function HomeHero({
         stamp={{ name: copy.doctorName, lines: copy.stampLines }}
         onDrawn={() => setDrawn(true)}
         onDone={() => {
-          store.current.revealedAt = performance.now();
+          // Pensa începe să urce puțin după ce loader-ul pornește spre ieșire.
+          store.current.revealedAt = performance.now() + 200;
           setLoaded(true);
         }}
       />
