@@ -9,7 +9,7 @@ import { serviceGroups, services, type ServiceGroup } from "@/lib/content";
 
 const groupTile: Record<ServiceGroup, string> = {
   consultatii: "bg-mist-bg",
-  interventii: "bg-secondary-container/40",
+  interventii: "bg-[#edf5f2]",
   ingrijire: "bg-surface-low",
 };
 
@@ -24,7 +24,7 @@ export default function ServicesTable() {
       <div className="lg:col-span-5">
         <div
           key={s.symbol}
-          className="flex h-full min-h-[420px] flex-col justify-between rounded-[2rem] border border-outline-variant/60 bg-secondary-container/20 p-6 shadow-sm animate-[fadeIn_.35s_ease]"
+          className="flex h-full min-h-[420px] flex-col justify-between rounded-[2rem] border border-outline-variant/60 bg-surface-lowest p-6 shadow-xl animate-[fadeIn_.35s_ease]"
           aria-live="polite"
         >
           <div>
@@ -69,7 +69,7 @@ export default function ServicesTable() {
                 aria-label={item.name}
                 className={`flex aspect-[4/5] min-w-0 flex-col justify-between rounded-2xl p-2 text-left transition-all sm:aspect-square sm:p-3 ${
                   active
-                    ? "-translate-y-0.5 border-2 border-primary bg-secondary-container/50 shadow-md ring-2 ring-primary/20"
+                    ? "-translate-y-0.5 border-2 border-primary bg-[#e8f3ee] shadow-md ring-2 ring-primary/20"
                     : `border border-outline-variant/50 hover:border-primary/50 ${groupTile[item.group]}`
                 }`}
               >
@@ -85,7 +85,7 @@ export default function ServicesTable() {
                   {t(item.symbol)}
                 </span>
                 <span
-                  className={`w-full min-w-0 hyphens-auto break-words text-center text-[10px] leading-tight sm:text-[11px] md:text-[13px] ${
+                  className={`w-full min-w-0 hyphens-auto break-words text-center text-[10px] leading-tight sm:text-[11px] lg:text-[10px] xl:text-[13px] ${
                     active ? "font-semibold text-primary" : "font-medium text-on-surface-variant"
                   }`}
                 >

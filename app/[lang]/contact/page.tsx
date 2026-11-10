@@ -1,6 +1,5 @@
 import { translator } from "@/lib/translate";
 import { ScrollReveal } from "@/components/ScrollReveal";
-import SectionFade from "@/components/site/SectionFade";
 import type { Metadata } from "next";
 import { SiteHeader } from "@/components/SiteHeader";
 import Footer from "@/components/site/Footer";
@@ -111,14 +110,13 @@ export default async function ContactPage({ params }: PageProps<"/[lang]/contact
       </section>
 
       {/* FAQ */}
-      <section className="bg-gradient-to-b from-mist-bg via-secondary-container to-primary px-6 pb-28 pt-16 md:pb-32 md:pt-20">
+      <section className="bg-gradient-to-b from-mist-bg via-secondary-container to-surface-mid px-6 pb-28 pt-16 md:pb-32 md:pt-20">
         <div className="mx-auto max-w-4xl">
           <h2 className="mb-10 text-center text-4xl text-primary md:text-5xl">{t("Întrebări frecvente")}</h2>
           <Faq items={faq} />
         </div>
       </section>
 
-      <SectionFade from="primary" to="surface-mid" />
       {/* URGENȚE + MENȚIUNE: pe fundalul deschis de la final */}
       <section className="flex flex-col items-center gap-2 bg-surface-mid px-6 py-5">
         <p className="flex items-center justify-center gap-3 text-center text-[15px] font-semibold text-primary">
