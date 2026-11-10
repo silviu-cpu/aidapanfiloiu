@@ -93,7 +93,6 @@ export default function ExperienceTimeline({ items }: { items: ExperienceItem[] 
   return (
     <section ref={sectionRef} data-reveal-skip className="relative bg-forest text-white" style={pinned && height ? { height } : undefined} aria-labelledby="experience-title">
       <div className={pinned ? "sticky top-0 flex h-screen flex-col overflow-hidden px-6 pb-12 pt-24" : "relative overflow-hidden px-6 py-24"}>
-        <div aria-hidden className="dot-grid pointer-events-none absolute inset-0 opacity-[0.06]" />
         <div className="relative mx-auto flex min-h-0 w-full max-w-4xl flex-1 flex-col">
           <div className="shrink-0 pb-10">
             <h2 id="experience-title" className="mb-3 text-4xl text-white md:text-5xl">{t("Experiență profesională")}</h2>

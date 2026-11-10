@@ -52,13 +52,13 @@ function isLeaf(el: Element, depth: number) {
   );
 }
 
-function mark(el: HTMLElement, delay: number, out: HTMLElement[]) {
-  el.setAttribute("data-reveal", "");
-  if (delay) el.style.setProperty("--reveal-delay", `${delay}ms`);
-  out.push(el);
+type Candidate = { el: HTMLElement; delay: number };
+
+function mark(el: HTMLElement, delay: number, out: Candidate[]) {
+  out.push({ el, delay });
 }
 
-function collect(el: Element, depth: number, out: HTMLElement[]) {
+function collect(el: Element, depth: number, out: Candidate[]) {
   let leafIndex = 0;
   for (const child of Array.from(el.children)) {
     if (!(child instanceof HTMLElement) || isDecorative(child) || child.closest("[data-reveal-skip]")) continue;
@@ -81,25 +81,8 @@ export function ScrollReveal() {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     if (!("IntersectionObserver" in window)) return;
 
-    // Secțiunile paginii, fără hero (secțiunea cu titlul paginii, h1) și fără cele excluse.
-    const sections = Array.from(document.querySelectorAll<HTMLElement>(".site-page > section, .site-page section, footer"))
-      .filter((s, i, all) => all.indexOf(s) === i && !s.parentElement?.closest("section"))
-      .filter((s) => !s.hasAttribute("data-reveal-skip") && !s.closest("[data-reveal-skip]"));
-    const marked: HTMLElement[] = [];
-    for (const section of sections) {
-      if (section.querySelector("h1")) continue;
-      collect(section, 0, marked);
-    }
-
-    // Ce e deja pe ecran rămâne așa cum e: ascundem doar ce urmează mai jos.
-    const below = marked.filter((el) => {
-      if (el.getBoundingClientRect().top < window.innerHeight) {
-        el.removeAttribute("data-reveal");
-        el.style.removeProperty("--reveal-delay");
-        return false;
-      }
-      return true;
-    });
+    let io: IntersectionObserver | null = null;
+    let below: HTMLElement[] = [];
 
     const finish = (event: AnimationEvent) => {
       const el = event.currentTarget as HTMLElement;
@@ -111,23 +94,47 @@ export function ScrollReveal() {
       el.removeEventListener("animationend", finish);
     };
 
-    const io = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (!entry.isIntersecting) continue;
-          const el = entry.target as HTMLElement;
-          el.addEventListener("animationend", finish);
-          el.classList.add("is-visible");
-          io.unobserve(el);
-        }
-      },
-      // Fără margine negativă jos: și ultimele rânduri din subsol trebuie să poată apărea.
-      { threshold: 0.08 },
-    );
-    below.forEach((el) => io.observe(el));
+    const run = () => {
+      // Secțiunile paginii, fără hero (secțiunea cu titlul paginii, h1) și fără cele excluse.
+      const sections = Array.from(document.querySelectorAll<HTMLElement>(".site-page section, footer"))
+        .filter((s) => !s.parentElement?.closest("section"))
+        .filter((s) => !s.closest("[data-reveal-skip]") && !s.querySelector("h1"));
+      const candidates: Candidate[] = [];
+      for (const section of sections) collect(section, 0, candidates);
+
+      // Ce e deja pe ecran nu se atinge: ascundem doar ce urmează mai jos.
+      const next = candidates.filter(({ el }) => el.getBoundingClientRect().top >= window.innerHeight);
+      below = next.map(({ el }) => el);
+      for (const { el, delay } of next) {
+        el.setAttribute("data-reveal", "");
+        if (delay) el.style.setProperty("--reveal-delay", `${delay}ms`);
+      }
+
+      io = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (!entry.isIntersecting) continue;
+            const el = entry.target as HTMLElement;
+            el.addEventListener("animationend", finish);
+            el.classList.add("is-visible");
+            io?.unobserve(el);
+          }
+        },
+        // Fără margine negativă jos: și ultimele rânduri din subsol trebuie să poată apărea.
+        { threshold: 0.08 },
+      );
+      below.forEach((el) => io?.observe(el));
+    };
+
+    // Așteptăm ca React să termine hidratarea paginii: dacă am modifica elementele
+    // înainte, React ar semnala o nepotrivire între HTML-ul de pe server și cel din browser.
+    const hasIdle = typeof window.requestIdleCallback === "function";
+    const idle = hasIdle ? window.requestIdleCallback(run, { timeout: 800 }) : window.setTimeout(run, 300);
 
     return () => {
-      io.disconnect();
+      if (hasIdle) window.cancelIdleCallback(idle);
+      else window.clearTimeout(idle);
+      io?.disconnect();
       for (const el of below) {
         el.removeAttribute("data-reveal");
         el.classList.remove("is-visible");
