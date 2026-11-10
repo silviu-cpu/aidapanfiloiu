@@ -11,6 +11,8 @@ export type HeroStore = {
   reduced: boolean;
   /** Momentul (performance.now) în care a plecat loader-ul; 0 cât încă se încarcă. */
   revealedAt: number;
+  /** Unde se termină textul de deasupra tăvii, ca fracție din înălțimea ecranului (0 = sus). */
+  textBottom: number;
 };
 
 export type Point = [number, number];

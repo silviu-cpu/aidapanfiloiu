@@ -1,8 +1,12 @@
+import { LocaleProvider } from "@/components/LocaleProvider";
+import { SymptomProvider } from "@/components/site/SymptomPicker";
+import { PrivacyProvider } from "@/components/site/PrivacyModal";
 import type { Metadata } from "next";
 import { Newsreader, Plus_Jakarta_Sans } from "next/font/google";
 import { notFound } from "next/navigation";
 import { common, hasLocale, locales, ogLocale } from "@/lib/i18n";
 import { site } from "@/lib/site";
+import { AppointmentProvider } from "@/components/site/AppointmentModal";
 import "../globals.css";
 
 const jakarta = Plus_Jakarta_Sans({
@@ -27,10 +31,18 @@ export async function generateMetadata({ params }: LayoutProps<"/[lang]">): Prom
   return {
     metadataBase: new URL(site.url),
     title: {
-      default: `${site.name} — ${t.tagline}`,
+      default: site.name,
       template: `%s | ${site.name}`,
     },
     description: t.description,
+    icons: {
+      icon: [
+        { url: "/brand/logo.svg", type: "image/svg+xml", sizes: "any" },
+        { url: "/brand/icon-96.png", type: "image/png", sizes: "96x96" },
+      ],
+      shortcut: "/favicon.ico",
+      apple: [{ url: "/brand/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
+    },
     openGraph: {
       type: "website",
       locale: ogLocale[lang],
@@ -57,7 +69,13 @@ export default async function RootLayout({ children, params }: LayoutProps<"/[la
           {t.skip}
         </a>
         <main id="continut" className="w-full flex-1">
-          {children}
+          <LocaleProvider lang={lang}>
+            <SymptomProvider>
+              <PrivacyProvider>
+                <AppointmentProvider>{children}</AppointmentProvider>
+              </PrivacyProvider>
+            </SymptomProvider>
+          </LocaleProvider>
         </main>
       </body>
     </html>

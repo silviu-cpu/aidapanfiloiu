@@ -1,5 +1,9 @@
+"use client";
+
+import { useTranslation } from "@/components/LocaleProvider";
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { AppointmentLink } from "./AppointmentModal";
 
 type Variant = "light" | "ghost-dark" | "primary" | "soft";
 
@@ -17,14 +21,19 @@ export function ButtonLink({
   variant = "primary",
   external = false,
   className = "",
+  appointment = false,
 }: {
   href: string;
   children: ReactNode;
   variant?: Variant;
   external?: boolean;
   className?: string;
+  appointment?: boolean;
 }) {
+  const { path } = useTranslation();
   const classes = `inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-[15px] font-semibold transition-all ${variants[variant]} ${className}`;
+
+  if (appointment) return <AppointmentLink href={href} className={classes}>{children}</AppointmentLink>;
 
   if (external || href.startsWith("http") || href.startsWith("tel:") || href.startsWith("mailto:")) {
     return (
@@ -39,7 +48,7 @@ export function ButtonLink({
   }
 
   return (
-    <Link href={href} className={classes}>
+    <Link href={path(href)} className={classes}>
       {children}
     </Link>
   );
@@ -56,16 +65,17 @@ export function SectionTitle({
   center?: boolean;
   light?: boolean;
 }) {
+  const { t } = useTranslation();
   return (
     <div className={`flex max-w-2xl flex-col gap-3 ${center ? "mx-auto items-center text-center" : ""}`}>
       <h2
         className={`text-4xl leading-tight md:text-5xl ${light ? "text-white" : "text-primary"}`}
       >
-        {title}
+        {t(title)}
       </h2>
       {intro && (
         <p className={`text-lg leading-relaxed ${light ? "text-mist" : "text-on-surface-variant"}`}>
-          {intro}
+          {t(intro)}
         </p>
       )}
     </div>
@@ -73,21 +83,22 @@ export function SectionTitle({
 }
 
 export function Faq({ items }: { items: { q: string; a: string }[] }) {
+  const { t } = useTranslation();
   return (
     <div className="flex flex-col gap-3">
       {items.map((item, i) => (
         <details
           key={item.q}
           open={i === 0}
-          className="group rounded-2xl bg-surface-low p-5 transition-colors open:bg-secondary-container/40"
+          className="group rounded-2xl border border-outline-variant/60 bg-surface-lowest p-5 transition-colors open:border-primary/30"
         >
           <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-semibold text-on-surface [&::-webkit-details-marker]:hidden">
-            <span>{item.q}</span>
+            <span>{t(item.q)}</span>
             <span className="text-xl leading-none text-primary transition-transform group-open:rotate-45">
               +
             </span>
           </summary>
-          <p className="mt-3 leading-relaxed text-on-surface-variant">{item.a}</p>
+          <p className="mt-3 leading-relaxed text-on-surface-variant">{t(item.a)}</p>
         </details>
       ))}
     </div>

@@ -1,16 +1,17 @@
+import { translator } from "@/lib/translate";
 import type { Metadata } from "next";
 import { SiteHeader } from "@/components/SiteHeader";
 import Footer from "@/components/site/Footer";
-import { alternates, getLang } from "@/lib/i18n";
+import { alternates, getLang, localePath, type Locale } from "@/lib/i18n";
 import Photo from "@/components/site/Photo";
 import Link from "next/link";
-import { ArrowDown, ArrowRight, Siren } from "lucide-react";
+import { ArrowDown, ArrowRight } from "lucide-react";
 import ConditionsGallery from "@/components/site/ConditionsGallery";
 import HeroBackdrop, { heroSectionClass } from "@/components/site/HeroBackdrop";
 import InvestigationsFile from "@/components/site/InvestigationsFile";
 import ServicesTable from "@/components/site/ServicesTable";
 import { ButtonLink, SectionTitle } from "@/components/site/ui";
-import { contact, disclaimer, images, locations, surgeryNote } from "@/lib/content";
+import { contact, disclaimer, doctor, images, locations, surgeryNote } from "@/lib/content";
 
 const laparoscopyBenefits = [
   "Câteva incizii mici",
@@ -43,16 +44,17 @@ const emergencies = [
 
 export async function generateMetadata({ params }: PageProps<"/[lang]/servicii">): Promise<Metadata> {
   const lang = await getLang(params);
+  const t = translator(lang);
   return {
-    title: "Servicii",
-    description:
-      "Consultații de chirurgie generală și proctologie, chirurgie laparoscopică, tratamentul plăgilor și urmărire postoperatorie în București.",
+    title: t("Servicii"),
+    description: t("Consultații de chirurgie generală și proctologie, chirurgie laparoscopică, tratamentul plăgilor și urmărire postoperatorie în București."),
     alternates: alternates(lang, "/servicii"),
   };
 }
 
 export default async function ServiciiPage({ params }: PageProps<"/[lang]/servicii">) {
   const lang = await getLang(params);
+  const t = translator(lang);
   return (
     <>
       <SiteHeader lang={lang} current="/servicii" />
@@ -62,30 +64,29 @@ export default async function ServiciiPage({ params }: PageProps<"/[lang]/servic
         <HeroBackdrop glow />
         <div className="container-x relative grid min-h-[440px] grid-cols-1 items-center gap-10 lg:grid-cols-12">
           <div className="flex flex-col items-start gap-5 lg:col-span-7">
-            <h1 className="text-5xl text-white md:text-6xl">Servicii</h1>
+            <h1 className="text-5xl text-white md:text-6xl">{t("Servicii")}</h1>
             <p className="max-w-xl text-lg text-surface-high">
-              Consultații, investigații și tratament chirurgical pentru afecțiunile abdominale,
-              proctologice și plăgi, în București.
-            </p>
+              {t("Consultații, investigații și tratament chirurgical pentru afecțiunile abdominale, proctologice și plăgi, în București.")}</p>
             <div className="flex flex-wrap gap-3 pt-2">
-              <ButtonLink href="/contact" variant="light">
-                Programează o consultație
-              </ButtonLink>
+              <ButtonLink href={localePath(lang, "/contact")} variant="light" appointment>
+                {t("Programează o consultație")}</ButtonLink>
               <ButtonLink href="#locatii" variant="ghost-dark">
-                Unde mă găsești?
-              </ButtonLink>
+                {t("Unde mă găsești?")}</ButtonLink>
             </div>
           </div>
           <div className="lg:col-span-5">
-            <div className="relative aspect-[4/3] w-full overflow-hidden rounded-[2rem] bg-primary-container/40 shadow-xl">
+            {/* Cadru pătrat, ca poza (520 × 520) să apară întreagă, fără tăieturi. */}
+            <div className="relative mx-auto aspect-square w-full max-w-[480px] overflow-hidden rounded-[2rem] bg-primary-container/40 shadow-xl lg:mr-0">
+              {/* Fotografia doamnei doctor (520 × 520 px), servită fără recomprimare ca să rămână clară. */}
               <Photo
-                src={images.laparoscopic}
-                alt="Instrument chirurgical laparoscopic"
+                src={images.doctor}
+                alt={`${doctor.name}, ${t(doctor.title)}`}
                 preload
+                unoptimized
                 sizes="(min-width: 1024px) 40vw, 100vw"
                 className="object-cover"
               />
-              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-deep/80 via-transparent to-transparent" />
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-deep/40 via-transparent to-transparent" />
             </div>
           </div>
         </div>
@@ -95,7 +96,7 @@ export default async function ServiciiPage({ params }: PageProps<"/[lang]/servic
       <section className="bg-surface py-16 md:py-20">
         <div className="container-x">
           <div className="mb-8">
-            <SectionTitle title="Ce ofer" intro="Alege un serviciu ca să vezi detaliile." />
+            <SectionTitle title={t("Ce ofer")} intro={t("Alege un serviciu ca să vezi detaliile.")} />
           </div>
           <ServicesTable />
         </div>
@@ -109,15 +110,12 @@ export default async function ServiciiPage({ params }: PageProps<"/[lang]/servic
         <div className="container-x">
           <SectionTitle
             center
-            title="Investigații"
-            intro="Ce investigații s-ar putea să-ți recomand și cum te pregătești pentru ele."
+            title={t("Investigații")}
+            intro={t("Ce investigații s-ar putea să-ți recomand și cum te pregătești pentru ele.")}
           />
           <div className="mt-10 md:mt-0">
             <InvestigationsFile />
           </div>
-          <p className="mt-6 text-center text-sm text-on-surface-variant">
-            Investigațiile exacte se stabilesc la consultație.
-          </p>
         </div>
       </section>
 
@@ -126,29 +124,28 @@ export default async function ServiciiPage({ params }: PageProps<"/[lang]/servic
         <div className="container-x grid grid-cols-1 items-center gap-10 lg:grid-cols-12">
           <div className="flex flex-col gap-6 lg:col-span-6">
             <SectionTitle
-              title="Chirurgie clasică sau laparoscopie?"
-              intro="Laparoscopia pune accent pe confort și pe o recuperare mai rapidă, cu aceeași eficiență a intervenției."
+              title={t("Chirurgie clasică sau laparoscopie?")}
+              intro={t("Laparoscopia pune accent pe confort și pe o recuperare mai rapidă, cu aceeași eficiență a intervenției.")}
             />
             <div className="flex flex-col gap-3 rounded-[2rem] bg-surface p-6">
-              <span className="text-lg font-semibold text-primary">Avantajele laparoscopiei</span>
+              <span className="text-lg font-semibold text-primary">{t("Avantajele laparoscopiei")}</span>
               <ul className="flex flex-col gap-2 text-on-surface-variant">
                 {laparoscopyBenefits.map((b) => (
                   <li key={b} className="flex items-center gap-2">
                     <span className="h-1.5 w-1.5 rounded-full bg-secondary" />
-                    {b}
+                    {t(b)}
                   </li>
                 ))}
               </ul>
               <p className="rounded-xl bg-surface-low p-3 text-sm text-on-surface-variant">
-                Alegerea tipului de intervenție se face la consultație, în funcție de fiecare caz.
-              </p>
+                {t("Alegerea tipului de intervenție se face la consultație, în funcție de fiecare caz.")}</p>
             </div>
           </div>
           <div className="lg:col-span-6">
             <div className="relative aspect-[4/3] w-full overflow-hidden rounded-[2rem] bg-primary/20 shadow-lg">
               <Photo
-                src={images.laparoscopicDevices}
-                alt="Instrumente pentru chirurgie laparoscopică"
+                src={images.operatingRoom}
+                alt={t("Sală de operație luminoasă, pregătită înaintea unei intervenții")}
                 sizes="(min-width: 1024px) 50vw, 100vw"
                 className="object-cover"
               />
@@ -160,24 +157,23 @@ export default async function ServiciiPage({ params }: PageProps<"/[lang]/servic
       {/* URGENȚE */}
       <section className="bg-surface py-16 md:py-20">
         <div className="container-x">
-          <div className="flex flex-col items-start justify-between gap-6 rounded-[2rem] border-l-4 border-l-primary bg-surface-lowest p-6 shadow-sm md:flex-row md:items-center">
-            <div className="max-w-3xl">
-              <h3 className="mb-3 font-sans text-lg font-semibold text-primary">Mergi la urgență dacă ai:</h3>
-              <ul className="grid grid-cols-1 gap-x-6 gap-y-2 text-on-surface-variant sm:grid-cols-2">
-                {emergencies.map((e) => (
-                  <li key={e} className="flex items-center gap-2">
-                    <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
-                    {e}
-                  </li>
-                ))}
-              </ul>
+          <div className="grid gap-8 border-y border-outline-variant/50 py-8 md:gap-12 md:py-10 lg:grid-cols-[1fr_2fr]">
+            <div className="flex flex-col items-start gap-5">
+              <h2 className="max-w-xs font-heading text-3xl leading-tight text-on-surface">{t("Mergi la urgență dacă ai:")}</h2>
+              <a
+                href="tel:112"
+                className="inline-flex min-h-11 items-center text-base font-semibold text-alert underline decoration-alert/40 underline-offset-4 transition-colors hover:decoration-alert focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-alert"
+              >
+                {t("Sună la 112")}
+              </a>
             </div>
-            <a
-              href="tel:112"
-              className="inline-flex shrink-0 items-center gap-2 rounded-full bg-alert px-6 py-3 font-semibold text-white"
-            >
-              <Siren size={18} /> Sună la 112
-            </a>
+            <ul className="divide-y divide-outline-variant/40 text-base leading-relaxed text-on-surface-variant">
+              {emergencies.map((e) => (
+                <li key={e} className="py-4 first:pt-0 last:pb-0">
+                  {t(e)}
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
       </section>
@@ -187,12 +183,12 @@ export default async function ServiciiPage({ params }: PageProps<"/[lang]/servic
         <div className="container-x">
           <div className="mb-10">
             <SectionTitle
-              title="Ce trebuie să știi dacă ai nevoie de operație"
-              intro="O intervenție reușită înseamnă și o pregătire atentă, și o recuperare făcută corect."
+              title={t("Ce trebuie să știi dacă ai nevoie de operație")}
+              intro={t("O intervenție reușită înseamnă și o pregătire atentă, și o recuperare făcută corect.")}
             />
           </div>
           <div className="relative grid grid-cols-1 gap-6 md:grid-cols-2">
-            <StepList title="Înainte de operație" items={before} tone="dark" />
+            <StepList lang={lang} title={t("Înainte de operație")} items={before} tone="dark" />
             {/* Săgeata de trecere dintre etape */}
             <span
               aria-hidden
@@ -205,7 +201,7 @@ export default async function ServiciiPage({ params }: PageProps<"/[lang]/servic
                 <ArrowDown size={20} />
               </span>
             </span>
-            <StepList title="După operație" items={after} tone="light" />
+            <StepList lang={lang} title={t("După operație")} items={after} tone="light" />
           </div>
         </div>
       </section>
@@ -216,28 +212,27 @@ export default async function ServiciiPage({ params }: PageProps<"/[lang]/servic
           <div className="mb-8">
             <SectionTitle
               light
-              title="Unde mă găsești"
-              intro="Consultațiile și intervențiile se fac în clinici și spitale din București."
+              title={t("Unde mă găsești")}
+              intro={t("Consultațiile și intervențiile se fac în clinici și spitale din București.")}
             />
           </div>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-5">
             {locations.map((l) => (
               <div key={l.id} className="flex min-h-[160px] flex-col rounded-2xl bg-primary-container/60 p-5">
-                <span className="mb-2 max-w-max rounded-full bg-secondary-container/20 px-2.5 py-0.5 text-xs font-semibold text-primary-fixed">
-                  {l.tag}
-                </span>
-                <h3 className="font-sans font-semibold text-white">{l.name}</h3>
-                <p className="mt-1 text-sm text-surface-high">{l.services}</p>
+                <h3 className="font-sans font-semibold text-white">{t(l.name)}</h3>
+                <p className="mt-4 text-sm leading-relaxed text-surface-high">{t(l.services)}</p>
               </div>
             ))}
           </div>
           <div className="mt-6 flex flex-wrap items-center justify-between gap-4 rounded-2xl bg-nav p-4">
-            <span className="flex items-center gap-2 font-medium">
-              <span className="h-2 w-2 rounded-full bg-primary-fixed" />
-              {surgeryNote}
+            <span className="font-medium">
+              {t(surgeryNote)}
             </span>
-            <Link href="/contact" className="text-sm text-primary-fixed hover:underline">
-              Vezi adresele și programul →
+            <Link
+              href={localePath(lang, "/contact#locatii")}
+              className="inline-flex min-h-11 w-full shrink-0 items-center justify-center rounded-full border border-primary-fixed/25 bg-primary-fixed/5 px-5 py-2.5 text-sm font-semibold text-primary-fixed transition-colors hover:border-primary-fixed/50 hover:bg-primary-fixed/15 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary-fixed sm:w-auto"
+            >
+              {t("Vezi adresele și programul")}
             </Link>
           </div>
         </div>
@@ -246,28 +241,27 @@ export default async function ServiciiPage({ params }: PageProps<"/[lang]/servic
       {/* CTA */}
       <section className="bg-surface py-20">
         <div className="mx-auto flex max-w-3xl flex-col items-center gap-5 px-6 text-center">
-          <h2 className="text-4xl text-primary md:text-5xl">Nu ești sigur de ce ai nevoie?</h2>
+          <h2 className="text-4xl text-primary md:text-5xl">{t("Nu ești sigur de ce ai nevoie?")}</h2>
           <p className="max-w-xl text-lg text-on-surface-variant">
-            Descrie-mi simptomele la consultație și găsim împreună răspunsul.
-          </p>
+            {t("Descrie-mi simptomele la consultație și găsim împreună răspunsul.")}</p>
           <div className="flex flex-wrap justify-center gap-3">
-            <ButtonLink href="/contact">
-              Programează o consultație <ArrowRight size={16} />
+            <ButtonLink href={localePath(lang, "/contact")} appointment>
+              {t("Programează o consultație")}{" "}<ArrowRight size={16} />
             </ButtonLink>
             <ButtonLink href={contact.whatsappHref} variant="soft">
-              Scrie-mi pe WhatsApp
-            </ButtonLink>
+              {t("Scrie-mi pe WhatsApp")}</ButtonLink>
           </div>
-          <p className="mt-4 text-xs text-on-surface-variant/70">{disclaimer}</p>
+          <p className="mt-4 text-xs text-on-surface-variant/70">{t(disclaimer)}</p>
         </div>
       </section>
       </div>
-      <Footer />
+      <Footer lang={lang} />
     </>
   );
 }
 
 function StepList({
+  lang,
   title,
   items,
   tone,
@@ -275,7 +269,9 @@ function StepList({
   title: string;
   items: { title: string; text: string }[];
   tone: "dark" | "light";
+  lang: Locale;
 }) {
+  const t = translator(lang);
   const dark = tone === "dark";
   return (
     <div
@@ -283,12 +279,12 @@ function StepList({
         dark ? "bg-primary-container text-white" : "bg-secondary-container text-primary"
       }`}
     >
-      <h3 className={`text-2xl md:text-3xl ${dark ? "text-white" : "text-primary"}`}>{title}</h3>
+      <h3 className={`text-2xl md:text-3xl ${dark ? "text-white" : "text-primary"}`}>{t(title)}</h3>
       <div className="flex flex-col gap-2">
         {items.map((it) => (
           <div key={it.title} className={`rounded-2xl p-4 ${dark ? "bg-white/10" : "bg-surface-lowest"}`}>
-            <strong className={`block font-semibold ${dark ? "text-white" : "text-on-surface"}`}>{it.title}</strong>
-            <span className={dark ? "text-secondary-fixed-dim" : "text-on-surface-variant"}>{it.text}</span>
+            <strong className={`block font-semibold ${dark ? "text-white" : "text-on-surface"}`}>{t(it.title)}</strong>
+            <span className={dark ? "text-secondary-fixed-dim" : "text-on-surface-variant"}>{t(it.text)}</span>
           </div>
         ))}
       </div>

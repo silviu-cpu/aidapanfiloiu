@@ -7,6 +7,8 @@ export const hasLocale = (value: string): value is Locale =>
 
 /** Româna nu are prefix în URL (/despre), engleza are (/en/despre). */
 export function localePath(lang: Locale, path: string) {
+  if (!path.startsWith("/")) return path;
+  path = path.replace(/^\/(?:en|ro)(?=\/|$)/, "") || "/";
   if (lang === defaultLocale) return path;
   return path === "/" ? "/en" : `/en${path}`;
 }
@@ -34,13 +36,13 @@ export const ogLocale: Record<Locale, string> = { ro: "ro_RO", en: "en_GB" };
 /** Texte comune tuturor paginilor. */
 export const common = {
   ro: {
-    tagline: "Site în lucru",
-    description: "Site-ul Aida Panfiloiu.",
+    tagline: "Chirurgie generală în București",
+    description: "Dr. Aida Panfiloiu, medic specialist chirurgie generală în București. Consultații de chirurgie generală și proctologie, chirurgie laparoscopică și îngrijirea plăgilor.",
     skip: "Sari la conținut",
   },
   en: {
-    tagline: "Website in progress",
-    description: "Aida Panfiloiu's website.",
+    tagline: "General surgery in Bucharest",
+    description: "Dr. Aida Panfiloiu, specialist in general surgery in Bucharest. General surgery and proctology consultations, laparoscopic surgery and wound care.",
     skip: "Skip to content",
   },
 } satisfies Record<Locale, Record<string, string>>;

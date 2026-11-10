@@ -58,7 +58,24 @@ const tmp = {
   camEnd: new THREE.Vector3(),
   camTarget: new THREE.Vector3(),
   lookEnd: new THREE.Vector3(),
+  fit: new THREE.Matrix4(),
 };
+
+/** Colțurile tăvii (cu tot cu margine), în lume, ca să știm cât ocupă pe ecran. */
+function trayCorners(portrait: boolean) {
+  const halfX = (portrait ? 3.9 : 5.9) / 2;
+  const halfZ = (portrait ? 5.9 : 3.9) / 2;
+  const corners: THREE.Vector3[] = [];
+  for (const x of [-halfX, halfX])
+    for (const z of [-halfZ, halfZ])
+      for (const y of [-0.42, 0.03]) corners.push(new THREE.Vector3(x, y, z).add(TRAY_POSITION));
+  return corners;
+}
+
+/** Spațiul lăsat liber sub text și la marginea de jos a ecranului (în coordonate -1..1). */
+const FIT_GAP_TOP = 0.05;
+const FIT_GAP_BOTTOM = 0.06;
+const FIT_MIN_SCALE = 0.55;
 
 export function Scene({ store }: { store: RefObject<HeroStore> }) {
   const scene = useThree((s) => s.scene);
@@ -89,7 +106,21 @@ export function Scene({ store }: { store: RefObject<HeroStore> }) {
     const dist = Math.max(7.6, (trayW * (portrait ? 1.45 : 1.3)) / (2 * TAN * aspect), (trayH * 2.45) / (2 * TAN));
     // Ținta camerei e mutată spre marginea îndepărtată a tăvii, ca tava să coboare pe ecran și să lase loc textului.
     const lookOffset = new THREE.Vector3(0, 0, portrait ? -1.7 : -1.8);
-    return { heroPos, heroScale, heroTilt, dist, lookOffset };
+
+    // Cât ocupă tava pe verticală în cadrul final (camera retrasă complet), de la -1 (jos) la 1 (sus).
+    const probe = new THREE.PerspectiveCamera(CAMERA_FOV, aspect, 0.1, 60);
+    const look = TRAY_POSITION.clone().add(lookOffset);
+    probe.position.copy(look).addScaledVector(END_DIR, dist);
+    probe.lookAt(look);
+    probe.updateMatrixWorld();
+    let trayTop = -Infinity;
+    let trayBottom = Infinity;
+    for (const corner of trayCorners(portrait)) {
+      const y = corner.project(probe).y;
+      trayTop = Math.max(trayTop, y);
+      trayBottom = Math.min(trayBottom, y);
+    }
+    return { heroPos, heroScale, heroTilt, dist, lookOffset, trayTop, trayBottom };
   }, [aspect, portrait]);
 
   useEffect(() => {
@@ -192,6 +223,21 @@ export function Scene({ store }: { store: RefObject<HeroStore> }) {
     camera.position.y += tmp.pointer.y * 0.15 * hero;
     tmp.camTarget.lerpVectors(ORIGIN, tmp.lookEnd, cam);
     camera.lookAt(tmp.camTarget);
+
+    // La final, tava se micșorează și coboară cât e nevoie ca să nu intre sub text.
+    // Mutăm doar imaginea (proiecția), deci perspectiva și umbrele rămân aceleași.
+    (camera as THREE.PerspectiveCamera).updateProjectionMatrix();
+    const textTop = st.textBottom > 0 ? 1 - 2 * st.textBottom - FIT_GAP_TOP : 1;
+    const floor = -1 + FIT_GAP_BOTTOM;
+    const fitScale = Math.min(1, Math.max(FIT_MIN_SCALE, (textTop - floor) / (layout.trayTop - layout.trayBottom)));
+    const fitShift = Math.min(0, textTop - fitScale * layout.trayTop);
+    const s = lerp(1, fitScale, pull);
+    const shift = lerp(0, fitShift, pull);
+    if (s !== 1 || shift !== 0) {
+      tmp.fit.set(s, 0, 0, 0, 0, s, 0, shift, 0, 0, 1, 0, 0, 0, 0, 1);
+      camera.projectionMatrix.premultiply(tmp.fit);
+      camera.projectionMatrixInverse.copy(camera.projectionMatrix).invert();
+    }
   });
 
   return (

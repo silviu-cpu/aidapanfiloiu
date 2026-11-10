@@ -1,7 +1,9 @@
 "use client";
 
+import { useTranslation } from "@/components/LocaleProvider";
+
 import { useEffect, useRef, useState } from "react";
-import { FileText, MousePointer2 } from "lucide-react";
+import { FileText } from "lucide-react";
 import { investigations } from "@/lib/content";
 
 const tabColors = [
@@ -16,6 +18,7 @@ const tabColors = [
  * Pe telefon, fișele devin o listă simplă.
  */
 export default function InvestigationsFile() {
+  const { t } = useTranslation();
   const ref = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(0);
   const [shown, setShown] = useState(false);
@@ -43,7 +46,7 @@ export default function InvestigationsFile() {
     <div ref={ref}>
       {/* Desktop: cartoteca */}
       <div className="hidden pt-36 md:block">
-        <div className="flex justify-center" role="group" aria-label="Investigații">
+        <div className="flex justify-center" role="group" aria-label={t("Investigații")}>
           {investigations.map((inv, i) => {
             const isActive = i === active;
             return (
@@ -73,7 +76,7 @@ export default function InvestigationsFile() {
                     tabColors[i % tabColors.length]
                   }`}
                 >
-                  {inv.name}
+                  {t(inv.name)}
                 </span>
                 <span
                   className={`relative flex h-full flex-col gap-3 rounded-2xl border border-[#e8e1d6] bg-[#fbf8f2] p-5 transition-shadow duration-500 ${
@@ -82,19 +85,16 @@ export default function InvestigationsFile() {
                 >
                   <span className="flex items-start gap-2">
                     <FileText size={18} className="mt-0.5 shrink-0 text-primary-container" />
-                    <span className="font-heading text-xl leading-tight text-primary">{inv.name}</span>
+                    <span className="font-heading text-xl leading-tight text-primary">{t(inv.name)}</span>
                   </span>
-                  <Detail label="Ce arată" text={inv.shows} />
-                  <Detail label="Când e nevoie" text={inv.when} />
-                  <Detail label="Cum te pregătești" text={inv.prep} />
+                  <Detail label={t("Ce arată")} text={inv.shows} />
+                  <Detail label={t("Când e nevoie")} text={inv.when} />
+                  <Detail label={t("Cum te pregătești")} text={inv.prep} />
                 </span>
               </button>
             );
           })}
         </div>
-        <p className="mt-10 flex items-center justify-center gap-2 text-sm text-on-surface-variant">
-          <MousePointer2 size={16} /> Treci cu mouse-ul peste o fișă ca să vezi detaliile.
-        </p>
       </div>
 
       {/* Telefon: listă */}
@@ -107,10 +107,10 @@ export default function InvestigationsFile() {
               shown ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
             }`}
           >
-            <span className="font-heading text-xl text-primary">{inv.name}</span>
-            <Detail label="Ce arată" text={inv.shows} />
-            <Detail label="Când e nevoie" text={inv.when} />
-            <Detail label="Cum te pregătești" text={inv.prep} />
+            <span className="font-heading text-xl text-primary">{t(inv.name)}</span>
+            <Detail label={t("Ce arată")} text={inv.shows} />
+            <Detail label={t("Când e nevoie")} text={inv.when} />
+            <Detail label={t("Cum te pregătești")} text={inv.prep} />
           </div>
         ))}
       </div>
@@ -119,9 +119,10 @@ export default function InvestigationsFile() {
 }
 
 function Detail({ label, text }: { label: string; text: string }) {
+  const { t } = useTranslation();
   return (
     <span className="block text-[13px] leading-snug text-on-surface-variant">
-      <strong className="font-semibold text-on-surface">{label}:</strong> {text}
+      <strong className="font-semibold text-on-surface">{t(label)}:</strong> {t(text)}
     </span>
   );
 }
