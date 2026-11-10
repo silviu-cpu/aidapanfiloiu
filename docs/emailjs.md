@@ -18,39 +18,39 @@ Dacă lipsește oricare dintre ele, formularul nu trimite nimic și îi arată p
 
 ## Șablonul de email
 
-Formularul trimite acești parametri; în șablon se folosesc ca `{{nume}}`, `{{telefon}}` etc.:
+Formularul trimite acești parametri; în șablon se folosesc ca `{{dr_aida_nume}}`, `{{dr_aida_telefon}}` etc. Prefixul `dr_aida_` le deosebește de variabilele altor site-uri din același cont EmailJS:
 
 | Parametru | Conținut |
 | --- | --- |
-| `nume` | Numele complet |
-| `telefon` | Numărul de telefon |
-| `email` | Emailul pacientului sau „—” |
-| `reply_to` | Emailul pacientului (gol dacă nu l-a dat) — pune `{{reply_to}}` la Reply To |
-| `motiv` | Tipul consultației, în română |
-| `preferinta` | Ziua sau intervalul preferat, sau „—” |
-| `afectiuni` | Afecțiunile bifate (ex. „Hernie, Colecist”), sau „—” |
-| `mesaj` | Textul de la „Altceva”, sau „—” |
-| `limba` | `ro` sau `en` — versiunea site-ului |
-| `pagina` | Adresa paginii de pe care s-a trimis |
-| `data` | Data și ora trimiterii (ora României) |
+| `dr_aida_nume` | Numele complet |
+| `dr_aida_telefon` | Numărul de telefon |
+| `dr_aida_email` | Emailul pacientului sau „—” |
+| `dr_aida_reply_to` | Emailul pacientului (gol dacă nu l-a dat) — pune `{{dr_aida_reply_to}}` la Reply To |
+| `dr_aida_motiv` | Tipul consultației, în română |
+| `dr_aida_preferinta` | Ziua sau intervalul preferat, sau „—” |
+| `dr_aida_afectiuni` | Afecțiunile bifate (ex. „Hernie, Colecist”), sau „—” |
+| `dr_aida_mesaj` | Textul de la „Altceva”, sau „—” |
+| `dr_aida_limba` | `ro` sau `en` — versiunea site-ului |
+| `dr_aida_pagina` | Adresa paginii de pe care s-a trimis |
+| `dr_aida_data` | Data și ora trimiterii (ora României) |
 
 Exemplu de conținut pentru șablon:
 
 ```
 Cerere nouă de programare
 
-Nume: {{nume}}
-Telefon: {{telefon}}
-Email: {{email}}
-Motiv: {{motiv}}
-Afecțiuni: {{afectiuni}}
-Detalii: {{mesaj}}
-Preferință: {{preferinta}}
+Nume: {{dr_aida_nume}}
+Telefon: {{dr_aida_telefon}}
+Email: {{dr_aida_email}}
+Motiv: {{dr_aida_motiv}}
+Afecțiuni: {{dr_aida_afectiuni}}
+Detalii: {{dr_aida_mesaj}}
+Preferință: {{dr_aida_preferinta}}
 
-Trimis pe {{data}} de pe {{pagina}} ({{limba}})
+Trimis pe {{dr_aida_data}} de pe {{dr_aida_pagina}} ({{dr_aida_limba}})
 ```
 
-Subiect sugerat: `Programare: {{nume}} – {{motiv}}`.
+Subiect sugerat: `Programare: {{dr_aida_nume}} – {{dr_aida_motiv}}`.
 
 ## Securitate
 
