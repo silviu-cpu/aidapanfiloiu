@@ -5,8 +5,8 @@ import { SIGNATURE_HEIGHT, SIGNATURE_PATHS, SIGNATURE_WIDTH } from "./signature"
 
 type Phase = "drawing" | "waiting" | "leaving" | "gone";
 
-/** Cât durează cusutul semnăturii, nodul de la final, cât mai așteptăm scena 3D și cât ține ieșirea. */
-const DRAW_MS = 2600;
+/** Cât durează umplerea semnăturii, bucla de la final, cât mai așteptăm scena 3D și cât ține ieșirea. */
+const FILL_MS = 1600;
 const KNOT_MS = 550;
 /** Cât durează ștampila: coborâre, apăsare, ridicare. */
 const STAMP_MS = 1100;
@@ -22,9 +22,9 @@ const clamp01 = (x: number) => Math.min(1, Math.max(0, x));
 const ease = (t: number) => 1 - Math.pow(1 - t, 1.5);
 
 /**
- * Ecranul de încărcare: semnătura doamnei doctor se scrie singură, literă cu literă.
- * La final apare o buclă și se aplică parafa, iar după ce s-a încărcat scena 3D
- * loader-ul pleacă.
+ * Ecranul de încărcare: semnătura doamnei doctor apare direct, întreagă, ca un contur, și se
+ * umple de culoare literă cu literă, de la stânga la dreapta; urmează bucla de la final, apoi
+ * ștampila coboară și aplică parafa. După ce s-a încărcat scena 3D, loader-ul pleacă.
  */
 export function Loader({
   ready,
@@ -55,7 +55,7 @@ export function Loader({
     callbacks.current = { onDrawn, onDone };
   });
 
-  // Etapa 1: scrisul. Elementele SVG se modifică direct, fără re-randări React la fiecare cadru.
+  // Etapa 1: semnătura, apoi ștampila. Elementele se modifică direct, fără re-randări React la fiecare cadru.
   useEffect(() => {
     const paths = main.current.filter((p): p is SVGPathElement => !!p);
     const lengths = paths.map((p) => p.getTotalLength());
@@ -63,58 +63,49 @@ export function Loader({
     const starts = lengths.map((_, i) => lengths.slice(0, i).reduce((a, b) => a + b, 0));
     const filled = new Array(paths.length).fill(false);
 
-    const duration = reduced ? 600 : DRAW_MS;
-    let end = { x: SIGNATURE_WIDTH, y: SIGNATURE_HEIGHT * 0.6 };
+    // Conturul semnăturii apare direct, întreg.
+    paths.forEach((path, i) => {
+      path.style.strokeDashoffset = "0";
+      const g = glow.current[i];
+      if (g) g.style.strokeDashoffset = "0";
+    });
+
+    // Bucla pornește din ultimul punct al semnăturii.
+    const last = paths.length - 1;
+    const endPoint = last >= 0 ? paths[last].getPointAtLength(lengths[last]) : { x: SIGNATURE_WIDTH, y: SIGNATURE_HEIGHT * 0.6 };
+    knot.current?.setAttribute("transform", `translate(${endPoint.x} ${endPoint.y})`);
+
+    // Ordinea: umplerea semnăturii, bucla, apoi ștampila cu parafa.
+    const fillMs = reduced ? 0 : FILL_MS;
+    const stampStart = fillMs + KNOT_MS * 0.7;
+    const endMs = reduced ? 0 : stampStart + STAMP_MS;
     let raf = 0;
     let start = 0;
-
-    const drawFrame = (p: number) => {
-      const L = p * total;
-      let active = -1;
-      paths.forEach((path, i) => {
-        const local = clamp01((L - starts[i]) / lengths[i]);
-        const offset = String(1 - local);
-        path.style.strokeDashoffset = offset;
-        const g = glow.current[i];
-        if (g) g.style.strokeDashoffset = offset;
-        if (local > 0 && local < 1) active = i;
-        // Litera terminată se „umple”, ca o semnătură cu cerneală.
-        if (local >= 1 && !filled[i]) {
-          filled[i] = true;
-          path.style.fillOpacity = "0.95";
-        }
-      });
-
-      // Ținem minte unde a ajuns scrisul, ca bucla de la final să pornească de acolo.
-      if (reduced || active < 0) return;
-      const point = paths[active].getPointAtLength(L - starts[active]);
-      end = { x: point.x, y: point.y };
-    };
-
-    // Ordinea: întâi numele scris, apoi ștampila aplică parafa.
-    const knotMs = reduced ? 0 : KNOT_MS;
-    const stampStart = duration + knotMs * 0.7;
-    const endMs = reduced ? duration : stampStart + STAMP_MS;
 
     const step = (now: number) => {
       if (!start) start = now;
       const elapsed = now - start;
 
-      // 1) Numele, care se scrie singur.
-      const t = clamp01(elapsed / duration);
-      drawFrame(ease(t));
-
-      // Bucla de la finalul semnăturii.
-      if (t >= 1 && !reduced) {
-        const k = clamp01((elapsed - duration) / KNOT_MS);
-        if (knot.current) {
-          knot.current.setAttribute("transform", `translate(${end.x} ${end.y})`);
-          knot.current.style.strokeDashoffset = String(1 - k);
+      // 1) Literele se umplu de cerneală pe rând, de la stânga la dreapta (tranziția e pe fill-opacity).
+      const reached = (reduced ? 1 : ease(clamp01(elapsed / fillMs))) * total;
+      paths.forEach((path, i) => {
+        if (!filled[i] && reached >= starts[i] + lengths[i] * 0.5) {
+          filled[i] = true;
+          path.style.fillOpacity = "0.95";
         }
+      });
+
+      // 2) Bucla de la finalul semnăturii.
+      if (!reduced && elapsed >= fillMs && knot.current) {
+        knot.current.style.strokeDashoffset = String(1 - clamp01((elapsed - fillMs) / KNOT_MS));
       }
 
-      // 2) Ștampila: coboară, apasă (parafa apare la impact), apoi se ridică și dispare.
-      if (!reduced && elapsed > stampStart) {
+      // 3) Ștampila: coboară, apasă (parafa apare la impact), apoi se ridică și dispare.
+      if (reduced) {
+        parafa.current?.classList.add("is-stamped");
+      } else {
+        // Se calculează la fiecare cadru, ca să ajungă sigur în poziția finală (ascunsă),
+        // chiar dacă browserul sare peste cadre.
         const s = clamp01((elapsed - stampStart) / STAMP_MS);
         const tool = stampTool.current;
         if (tool) {
@@ -135,8 +126,6 @@ export function Loader({
           }
         }
         if (s >= 0.44) parafa.current?.classList.add("is-stamped");
-      } else if (reduced && t >= 1) {
-        parafa.current?.classList.add("is-stamped");
       }
 
       if (elapsed < endMs) {
@@ -251,7 +240,8 @@ export function Loader({
       </svg>
 
         {/* Parafa sub nume, iar deasupra ei ștampila care coboară, apasă și pleacă */}
-        <div aria-hidden="true" className="absolute -bottom-16 right-[2%] sm:-bottom-20">
+        {/* Destul de jos încât ștampila, când apasă, să nu acopere semnătura. */}
+        <div aria-hidden="true" className="absolute -bottom-36 right-[2%] sm:-bottom-[11.5rem]">
           <div
             ref={parafa}
             className="parafa rounded-[10px] border-[3px] border-double border-[#8fe6ea]/80 px-4 py-2 text-center font-serif leading-tight text-[#8fe6ea]/85"
@@ -271,7 +261,7 @@ export function Loader({
               />
               <div
                 ref={stampTool}
-                className="pointer-events-none absolute -inset-x-[8%] bottom-0 origin-bottom"
+                className="pointer-events-none absolute inset-x-[2%] bottom-0 origin-bottom"
                 style={{ opacity: 0, transform: "translateY(calc(-1 * var(--lift, 160px))) scaleY(var(--squish, 1))" }}
               >
                 {/* Ștampila de parafă cu mâner de lemn, văzută ușor de sus */}

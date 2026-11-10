@@ -156,7 +156,7 @@ html.lenis {
   pointer-events: none;
 }
 
-/* Parafa din loader: cerneală neuniformă; apare când ștampila o apasă (clasa is-stamped). */
+/* Parafa din loader: cerneală neuniformă; e ascunsă până când ștampila o apasă (clasa is-stamped). */
 .parafa {
   filter: url(#parafa-ink);
   opacity: 0;
