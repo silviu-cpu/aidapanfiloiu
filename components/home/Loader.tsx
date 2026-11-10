@@ -14,60 +14,17 @@ const MAX_WAIT_MS = 4000;
 const HOLD_MS = 350;
 const EXIT_MS = 800;
 
-/*
- * Instrumentul care scrie: un portac (pensa cu inele folosită la suturi) care ține un ac
- * chirurgical curb, cu firul ieșind din coada acului. Vârful acului e în origine (punctul
- * care scrie), iar portacul urcă spre dreapta-sus, ca un stilou ținut în mână.
- * Unități ale semnăturii (aprox. 9 unități = 1 px).
- */
-type Vec = [number, number];
-const add = (a: Vec, b: Vec, k = 1): Vec => [a[0] + b[0] * k, a[1] + b[1] * k];
-const unit = (v: Vec): Vec => {
-  const l = Math.hypot(v[0], v[1]);
-  return [v[0] / l, v[1] / l];
-};
-const pt = (v: Vec) => `${v[0].toFixed(1)} ${v[1].toFixed(1)}`;
-
-/** Acul curb (aprox. 3/8 de cerc), de la vârf până la coadă. */
-const NEEDLE = "M0 0C8 -66 -40 -138 -122 -150";
-/** Coada acului (partea în care e prins firul), puțin mai groasă. */
-const NEEDLE_SWAGE = "M-104 -149L-122 -150";
-/** Firul care pleacă din coada acului. */
-const THREAD = "M-122 -150C-180 -156 -236 -120 -268 -70";
-
-const DIR = unit([0.55, -0.83]);
-const PERP: Vec = [-DIR[1], DIR[0]];
-/** Punctul în care fălcile portacului prind acul (pe curba acului). */
-const GRIP: Vec = [-41, -111];
-const JOINT = add(GRIP, DIR, 150);
-const RING_BASE = add(JOINT, DIR, 430);
-const RINGS: Vec[] = [add(RING_BASE, PERP, 64), add(RING_BASE, PERP, -64)];
-const RING_R = 58;
-
-const HOLDER = {
-  jaws: `M${pt(add(GRIP, PERP, 7))}L${pt(add(JOINT, PERP, 16))}M${pt(add(GRIP, PERP, -7))}L${pt(add(JOINT, PERP, -16))}`,
-  shanks: RINGS.map((ring, i) => {
-    const from = add(JOINT, PERP, i === 0 ? 16 : -16);
-    const edge = add(ring, unit([JOINT[0] - ring[0], JOINT[1] - ring[1]]), RING_R);
-    return `M${pt(from)}L${pt(edge)}`;
-  }).join(""),
-};
-
-/** Mărimea instrumentului față de semnătură (să se recunoască, fără să acopere literele). */
-const NEEDLE_SCALE = 1.25;
-/** Nodul de la finalul cusăturii, desenat față de ultimul punct al semnăturii. */
+/** Bucla de la finalul semnăturii, desenată față de ultimul ei punct. */
 const KNOT = "M0 0C26 -44 86 -40 70 4C58 38 8 26 22 -6C34 -34 74 -30 104 -8";
 
 const clamp01 = (x: number) => Math.min(1, Math.max(0, x));
 /** Pornește direct, curge constant și încetinește puțin spre final. */
 const ease = (t: number) => 1 - Math.pow(1 - t, 1.5);
-/** Cea mai scurtă diferență dintre două unghiuri (grade). */
-const angleDelta = (a: number, b: number) => ((((b - a) % 360) + 540) % 360) - 180;
 
 /**
- * Ecranul de încărcare: un ac chirurgical „coase” semnătura doamnei doctor,
- * literă cu literă; firul lăsat în urmă devine scrisul. La final se face un nod și
- * se aplică parafa, iar după ce s-a încărcat scena 3D loader-ul pleacă.
+ * Ecranul de încărcare: semnătura doamnei doctor se scrie singură, literă cu literă.
+ * La final apare o buclă și se aplică parafa, iar după ce s-a încărcat scena 3D
+ * loader-ul pleacă.
  */
 export function Loader({
   ready,
@@ -88,7 +45,6 @@ export function Loader({
   const [phase, setPhase] = useState<Phase>("drawing");
   const main = useRef<(SVGPathElement | null)[]>([]);
   const glow = useRef<(SVGPathElement | null)[]>([]);
-  const needle = useRef<SVGGElement>(null);
   const knot = useRef<SVGPathElement>(null);
   const parafa = useRef<HTMLDivElement>(null);
   const stampTool = useRef<HTMLDivElement>(null);
@@ -99,7 +55,7 @@ export function Loader({
     callbacks.current = { onDrawn, onDone };
   });
 
-  // Etapa 1: cusutul. Elementele SVG se modifică direct, fără re-randări React la fiecare cadru.
+  // Etapa 1: scrisul. Elementele SVG se modifică direct, fără re-randări React la fiecare cadru.
   useEffect(() => {
     const paths = main.current.filter((p): p is SVGPathElement => !!p);
     const lengths = paths.map((p) => p.getTotalLength());
@@ -108,16 +64,9 @@ export function Loader({
     const filled = new Array(paths.length).fill(false);
 
     const duration = reduced ? 600 : DRAW_MS;
-    const pos = { x: 0, y: 0, angle: 0, placed: false };
     let end = { x: SIGNATURE_WIDTH, y: SIGNATURE_HEIGHT * 0.6 };
     let raf = 0;
     let start = 0;
-
-    const placeNeedle = (x: number, y: number, angle: number, opacity: number) => {
-      if (!needle.current) return;
-      needle.current.setAttribute("transform", `translate(${x} ${y}) rotate(${angle})`);
-      needle.current.style.opacity = String(opacity);
-    };
 
     const drawFrame = (p: number) => {
       const L = p * total;
@@ -136,23 +85,10 @@ export function Loader({
         }
       });
 
+      // Ținem minte unde a ajuns scrisul, ca bucla de la final să pornească de acolo.
       if (reduced || active < 0) return;
-      const path = paths[active];
-      const at = (L - starts[active]);
-      const pt = path.getPointAtLength(at);
-      const ahead = path.getPointAtLength(Math.min(lengths[active], at + 6));
-      const target = (Math.atan2(ahead.y - pt.y, ahead.x - pt.x) * 180) / Math.PI;
-      if (!pos.placed) {
-        Object.assign(pos, { x: pt.x, y: pt.y, angle: 0, placed: true });
-      }
-      // Instrumentul alunecă lin între puncte (și peste salturile dintre litere).
-      pos.x += (pt.x - pos.x) * 0.45;
-      pos.y += (pt.y - pos.y) * 0.45;
-      // Rămâne aproape drept, ca un stilou în mână: se înclină doar puțin după direcția scrisului.
-      const lean = Math.max(-9, Math.min(9, angleDelta(0, target) * 0.08));
-      pos.angle += (lean - pos.angle) * 0.15;
-      end = { x: pt.x, y: pt.y };
-      placeNeedle(pos.x, pos.y, pos.angle, 1);
+      const point = paths[active].getPointAtLength(L - starts[active]);
+      end = { x: point.x, y: point.y };
     };
 
     // Ordinea: întâi numele scris, apoi ștampila aplică parafa.
@@ -164,19 +100,17 @@ export function Loader({
       if (!start) start = now;
       const elapsed = now - start;
 
-      // 1) Numele, scris de portac.
+      // 1) Numele, care se scrie singur.
       const t = clamp01(elapsed / duration);
       drawFrame(ease(t));
 
-      // Nodul de la final: firul face o buclă, iar portacul iese în sus și dispare.
+      // Bucla de la finalul semnăturii.
       if (t >= 1 && !reduced) {
         const k = clamp01((elapsed - duration) / KNOT_MS);
         if (knot.current) {
           knot.current.setAttribute("transform", `translate(${end.x} ${end.y})`);
           knot.current.style.strokeDashoffset = String(1 - k);
         }
-        const out = k * k;
-        placeNeedle(end.x + 104 + out * 260, end.y - 8 - out * 360, 0, 1 - out);
       }
 
       // 2) Ștampila: coboară, apasă (parafa apare la impact), apoi se ridică și dispare.
@@ -302,7 +236,7 @@ export function Loader({
           ))}
         </g>
 
-        {/* Nodul de la final */}
+        {/* Bucla de la final */}
         <path
           ref={knot}
           d={KNOT}
@@ -314,32 +248,6 @@ export function Loader({
           strokeDashoffset={1}
         />
 
-        {/* Portacul care ține acul curb, cu firul din coada acului */}
-        {!reduced && (
-          <g ref={needle} style={{ opacity: 0 }}>
-            <g transform={`scale(${NEEDLE_SCALE})`} stroke="#dfe7ea" vectorEffect="non-scaling-stroke">
-              <path d={THREAD} stroke="#8fe6ea" strokeOpacity={0.6} strokeWidth={1} vectorEffect="non-scaling-stroke" />
-              {/* Acul */}
-              <path d={NEEDLE} strokeWidth={2.2} vectorEffect="non-scaling-stroke" />
-              <path d={NEEDLE} stroke="#ffffff" strokeOpacity={0.75} strokeWidth={0.7} vectorEffect="non-scaling-stroke" />
-              <path d={NEEDLE_SWAGE} strokeWidth={3.2} vectorEffect="non-scaling-stroke" />
-              {/* Portacul: fălcile, încheietura, brațele și inelele */}
-              <path d={HOLDER.jaws} strokeWidth={1.8} vectorEffect="non-scaling-stroke" />
-              <circle cx={JOINT[0]} cy={JOINT[1]} r={20} strokeWidth={1.4} vectorEffect="non-scaling-stroke" />
-              <path d={HOLDER.shanks} strokeWidth={1.6} vectorEffect="non-scaling-stroke" />
-              {RINGS.map((ring) => (
-                <circle
-                  key={pt(ring)}
-                  cx={ring[0]}
-                  cy={ring[1]}
-                  r={RING_R}
-                  strokeWidth={1.6}
-                  vectorEffect="non-scaling-stroke"
-                />
-              ))}
-            </g>
-          </g>
-        )}
       </svg>
 
         {/* Parafa sub nume, iar deasupra ei ștampila care coboară, apasă și pleacă */}
