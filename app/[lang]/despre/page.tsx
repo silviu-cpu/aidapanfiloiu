@@ -1,6 +1,5 @@
 import { translator } from "@/lib/translate";
 import { ScrollReveal } from "@/components/ScrollReveal";
-import SectionFade from "@/components/site/SectionFade";
 import type { Metadata } from "next";
 import { ExternalLink } from "lucide-react";
 import { SiteHeader } from "@/components/SiteHeader";
@@ -95,8 +94,9 @@ export default async function DesprePage({ params }: PageProps<"/[lang]/despre">
       </section>
 
       {/* PREZENTARE PROFESIONALĂ */}
-      <section className="bg-surface-lowest px-6 py-20">
-        <div className="mx-auto max-w-4xl text-center">
+      {/* Ca „Ghidul afecțiunilor” de pe Acasă: cardul stă pe gradientul care coboară spre verdele de dedesubt. */}
+      <section className="bg-gradient-to-b from-surface-lowest via-secondary-container to-forest px-6 py-16 md:py-24">
+        <div className="mx-auto max-w-4xl rounded-[2.5rem] bg-surface-lowest px-6 py-12 text-center shadow-xl md:px-16 md:py-16">
           <h2 className="font-heading text-3xl leading-snug text-on-surface md:text-[40px]">
             {t("Chirurgie generală, cu accent pe laparoscopie și proctologie")}
           </h2>
@@ -106,16 +106,15 @@ export default async function DesprePage({ params }: PageProps<"/[lang]/despre">
         </div>
       </section>
 
-      <SectionFade from="surface-lowest" to="forest" />
       {/* EXPERIENȚĂ */}
       <ExperienceTimeline items={experience} />
 
-      <SectionFade from="forest" to="surface-lowest" />
       {/* EDUCAȚIE */}
-      <section className="bg-surface-lowest px-6 py-16 md:py-20">
+      {/* Pornește din verdele secțiunii de sus și se deschide în spatele cardului cu lista. */}
+      <section className="bg-gradient-to-b from-forest via-secondary-container to-surface-lowest px-6 py-16 md:py-24">
         <div className="mx-auto max-w-4xl">
-          <h2 className="mb-8 text-3xl leading-tight text-on-surface md:text-[40px]">{t("Studii și competențe")}</h2>
-          <ul className="divide-y divide-surface-high/70 border-y border-surface-high/70">
+          <h2 className="mb-8 text-3xl leading-tight text-white md:text-[40px]">{t("Studii și competențe")}</h2>
+          <ul className="divide-y divide-surface-high/70 rounded-[2rem] bg-surface-lowest px-6 shadow-xl md:px-10">
             {education.map((e) => (
               <li key={e.title} className="grid gap-2 py-6 sm:grid-cols-[9rem_minmax(0,1fr)] sm:gap-6">
                 <span className="pt-0.5 text-sm font-medium tabular-nums text-secondary">{e.years && t(e.years)}</span>
@@ -130,7 +129,7 @@ export default async function DesprePage({ params }: PageProps<"/[lang]/despre">
       </section>
 
       {/* CONGRESE ȘI CONFERINȚE */}
-      <section className="bg-surface px-6 py-16 md:py-20">
+      <section className="bg-surface-lowest px-6 py-16 md:py-20">
         <div className="mx-auto max-w-4xl">
           <h2 className="mb-8 text-3xl leading-tight text-on-surface md:text-[40px]">{t("Congrese și conferințe")}</h2>
           <ul className="divide-y divide-surface-high/70 border-y border-surface-high/70">
@@ -145,7 +144,7 @@ export default async function DesprePage({ params }: PageProps<"/[lang]/despre">
       </section>
 
       {/* EDUCAȚIE MEDICALĂ */}
-      <section className="bg-gradient-to-b from-surface-lowest via-secondary-container to-deep-2 px-6 py-16 md:py-24">
+      <section className="bg-gradient-to-b from-surface-lowest via-secondary-container to-surface px-6 py-16 md:py-24">
         <div className="relative mx-auto max-w-6xl overflow-hidden rounded-[2.5rem] bg-gradient-to-r from-nav via-deep-2 to-primary-container text-white shadow-2xl">
           <div className="relative grid grid-cols-1 lg:grid-cols-12">
             <div className="flex flex-col justify-center gap-6 p-8 sm:p-12 lg:col-span-6 lg:p-16">
@@ -198,7 +197,6 @@ export default async function DesprePage({ params }: PageProps<"/[lang]/despre">
         </div>
       </section>
 
-      <SectionFade from="deep-2" to="surface" />
       {/* CTA */}
       <section className="bg-gradient-to-b from-surface via-secondary-container/30 to-surface-low/60 px-6 py-24">
         <div className="mx-auto flex max-w-4xl flex-col items-center gap-8 text-center">

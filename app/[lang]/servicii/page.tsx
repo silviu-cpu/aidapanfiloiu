@@ -1,6 +1,5 @@
 import { translator } from "@/lib/translate";
 import { ScrollReveal } from "@/components/ScrollReveal";
-import SectionFade from "@/components/site/SectionFade";
 import type { Metadata } from "next";
 import { SiteHeader } from "@/components/SiteHeader";
 import Footer from "@/components/site/Footer";
@@ -95,7 +94,8 @@ export default async function ServiciiPage({ params }: PageProps<"/[lang]/servic
       </section>
 
       {/* TABEL PERIODIC */}
-      <section className="bg-surface py-16 md:py-20">
+      {/* Ca pe Acasă: plăcuțele stau pe gradientul care coboară spre verdele galeriei. */}
+      <section className="bg-gradient-to-b from-surface via-secondary-container to-forest py-16 md:py-24">
         <div className="container-x">
           <div className="mb-8">
             <SectionTitle title={t("Ce ofer")} intro={t("Alege un serviciu ca să vezi detaliile.")} />
@@ -104,16 +104,16 @@ export default async function ServiciiPage({ params }: PageProps<"/[lang]/servic
         </div>
       </section>
 
-      <SectionFade from="surface" to="forest" />
       {/* AFECȚIUNI: GALERIE LA SCROLL */}
       <ConditionsGallery />
 
-      <SectionFade from="forest" to="mist-bg" />
       {/* INVESTIGAȚII: CARTOTECĂ */}
-      <section className="overflow-hidden bg-mist-bg py-16 md:py-20">
+      {/* Pornește din verdele galeriei (titlul e alb) și se deschide în spatele fișelor. */}
+      <section className="overflow-hidden bg-gradient-to-b from-forest via-secondary-container to-mist-bg py-16 md:py-24">
         <div className="container-x">
           <SectionTitle
             center
+            light
             title={t("Investigații")}
             intro={t("Ce investigații s-ar putea să-ți recomand și cum te pregătești pentru ele.")}
           />
@@ -242,10 +242,10 @@ export default async function ServiciiPage({ params }: PageProps<"/[lang]/servic
         </div>
       </section>
 
-      <SectionFade from="deep" to="surface" />
       {/* CTA */}
-      <section className="bg-surface py-20">
-        <div className="mx-auto flex max-w-3xl flex-col items-center gap-5 px-6 text-center">
+      {/* Pornește din verdele locațiilor; textul stă într-un card alb, ca să se citească pe tot gradientul. */}
+      <section className="bg-gradient-to-b from-deep via-secondary-container to-surface px-6 py-16 md:py-24">
+        <div className="mx-auto flex max-w-4xl flex-col items-center gap-5 rounded-[2.5rem] bg-surface-lowest px-6 py-12 text-center shadow-xl md:px-16 md:py-16">
           <h2 className="text-4xl text-primary md:text-5xl">{t("Nu ești sigur de ce ai nevoie?")}</h2>
           <p className="max-w-xl text-lg text-on-surface-variant">
             {t("Descrie-mi simptomele la consultație și găsim împreună răspunsul.")}</p>

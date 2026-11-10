@@ -134,18 +134,19 @@ export default function CallbackForm({ twoColumns = false }: { twoColumns?: bool
     const data = new FormData(e.currentTarget);
     const field = (name: string) => String(data.get(name) ?? "").trim();
     // Numele parametrilor trebuie să fie identice cu {{variabilele}} din șablonul EmailJS.
+    // Prefixul dr_aida_ le deosebește de variabilele altor site-uri din același cont EmailJS.
     const params = {
-      nume: field("nume"),
-      telefon: field("telefon"),
-      email: field("email") || "—",
-      reply_to: field("email"),
-      motiv: REASONS[field("motiv")] ?? field("motiv"),
-      preferinta: field("preferinta") || "—",
-      afectiuni: selectedSymptoms(selected).map((s) => s.label).join(", ") || "—",
-      mesaj: field("mesaj") || "—",
-      limba: lang, // "ro" sau "en": versiunea site-ului de pe care a venit cererea
-      pagina: window.location.href,
-      data: new Date().toLocaleString("ro-RO", { timeZone: "Europe/Bucharest" }),
+      dr_aida_nume: field("nume"),
+      dr_aida_telefon: field("telefon"),
+      dr_aida_email: field("email") || "—",
+      dr_aida_reply_to: field("email"),
+      dr_aida_motiv: REASONS[field("motiv")] ?? field("motiv"),
+      dr_aida_preferinta: field("preferinta") || "—",
+      dr_aida_afectiuni: selectedSymptoms(selected).map((s) => s.label).join(", ") || "—",
+      dr_aida_mesaj: field("mesaj") || "—",
+      dr_aida_limba: lang, // "ro" sau "en": versiunea site-ului de pe care a venit cererea
+      dr_aida_pagina: window.location.href,
+      dr_aida_data: new Date().toLocaleString("ro-RO", { timeZone: "Europe/Bucharest" }),
     };
     setStatus("sending");
     try {
