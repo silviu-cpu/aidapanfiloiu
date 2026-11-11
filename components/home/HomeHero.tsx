@@ -166,9 +166,15 @@ export function HomeHero({
     const st = store.current;
     gsap.registerPlugin(ScrollTrigger);
 
-    const lenis = new Lenis({ lerp: 0.085 });
-    lenis.on("scroll", ScrollTrigger.update);
-    const tick = (time: number) => lenis.raf(time * 1000);
+    // Pe telefon, bara de adrese care apare și dispare nu trebuie să recalculeze animația.
+    ScrollTrigger.config({ ignoreMobileResize: true });
+
+    // Scroll-ul lin (Lenis) e doar pentru mouse. Pe ecrane tactile rămâne scroll-ul
+    // nativ al telefonului, care e deja fluid și nu are nevoie de încă un strat peste el.
+    const touch = window.matchMedia("(pointer: coarse)").matches;
+    const lenis = touch ? null : new Lenis({ lerp: 0.085 });
+    lenis?.on("scroll", ScrollTrigger.update);
+    const tick = (time: number) => lenis?.raf(time * 1000);
     gsap.ticker.add(tick);
     gsap.ticker.lagSmoothing(0);
 
@@ -196,7 +202,7 @@ export function HomeHero({
     return () => {
       ctx.revert();
       gsap.ticker.remove(tick);
-      lenis.destroy();
+      lenis?.destroy();
       st.progress = 0;
     };
   }, [reduced, entered, store]);
@@ -219,7 +225,7 @@ export function HomeHero({
       <section
         ref={trackRef}
         aria-labelledby="hero-title"
-        className={reduced ? "relative" : "relative h-[340svh]"}
+        className={reduced ? "relative" : "relative h-[340svh] bg-[#1d4246]"}
       >
         <div ref={stageRef} className="hero-bg sticky top-0 h-svh overflow-hidden text-white">
           <div className="absolute inset-0" aria-hidden="true">
@@ -270,7 +276,7 @@ export function HomeHero({
                 </AppointmentLink>
                 <Link
                   href={conditionsHref}
-                  className="rounded-full border border-white/20 bg-white/10 px-6 py-3 text-sm font-semibold text-white backdrop-blur-md transition-colors hover:bg-white/20"
+                  className="rounded-full border border-white/20 bg-white/10 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-white/20 md:backdrop-blur-md"
                 >
                   {copy.ctaSecondary} <span aria-hidden="true">↗</span>
                 </Link>

@@ -79,7 +79,12 @@ function FieldError({ id, message }: { id: string; message?: string }) {
 }
 
 /** Formular „Vrei să te sun eu?”: cererea ajunge pe email prin EmailJS. */
-export default function CallbackForm({ twoColumns = false }: { twoColumns?: boolean }) {
+/**
+ * `twoColumns`: câmpurile în stânga și simptomele în dreapta (pagina de Contact).
+ * `compact`: varianta din fereastra de programare, cu câmpurile câte două pe rând
+ * și simptomele ca etichete, ca să încapă fără derulare.
+ */
+export default function CallbackForm({ twoColumns = false, compact = false }: { twoColumns?: boolean; compact?: boolean }) {
   const { t, lang } = useTranslation();
   const { selected } = useSymptoms();
   const consentId = useId();
@@ -103,6 +108,7 @@ export default function CallbackForm({ twoColumns = false }: { twoColumns?: bool
     const el = e.currentTarget;
     if (touched[el.name as Field] || el.tagName === "SELECT" || (el as HTMLInputElement).type === "checkbox") check(el);
   };
+  const pairLabel = compact ? "sm:flex sm:min-h-10 sm:flex-wrap sm:content-end sm:gap-x-1" : "";
   const fieldProps = (name: Field) => ({
     onBlur,
     onChange,
@@ -159,7 +165,7 @@ export default function CallbackForm({ twoColumns = false }: { twoColumns?: bool
 
   if (status === "sent") {
     return (
-      <div className="flex flex-col items-center gap-3 rounded-[2rem] bg-surface p-10 text-center shadow-sm" role="status">
+      <div className={`flex flex-col items-center justify-center gap-3 p-10 text-center ${compact ? "h-full min-h-72" : "rounded-[2rem] bg-surface shadow-sm"}`} role="status">
         <CircleCheck className="text-primary" size={40} />
         <p className="text-xl font-semibold text-primary">{t("Mulțumesc!")}</p>
         <p className="text-on-surface-variant">{t("Te sun în cel mai scurt timp pentru a stabili programarea.")}</p>
@@ -168,9 +174,13 @@ export default function CallbackForm({ twoColumns = false }: { twoColumns?: bool
   }
 
   return (
-    <form onSubmit={onSubmit} noValidate className="flex flex-col gap-6 rounded-[2rem] bg-surface p-6 shadow-sm md:p-10">
-      <div className={twoColumns ? "grid gap-8 lg:grid-cols-2 lg:gap-12" : "flex flex-col gap-6"}>
-      <div className="flex min-w-0 flex-col gap-4">
+    <form
+      onSubmit={onSubmit}
+      noValidate
+      className={compact ? "flex flex-col gap-5 p-6 pt-7 md:p-8 md:pr-10 md:pt-12" : "flex flex-col gap-6 rounded-[2rem] bg-surface p-6 shadow-sm md:p-10"}
+    >
+      <div className={twoColumns ? "grid gap-8 lg:grid-cols-2 lg:gap-12" : compact ? "flex flex-col gap-5" : "flex flex-col gap-6"}>
+      <div className={compact ? "grid min-w-0 gap-x-4 gap-y-3 text-sm sm:grid-cols-2" : "flex min-w-0 flex-col gap-4"}>
       <label className="flex flex-col gap-1.5">
         <span className="font-semibold text-on-surface">{t("Nume complet")}</span>
         <input className={inputClass} name="nume" placeholder={t("Ex: Maria Popescu")} required minLength={3} autoComplete="name" {...fieldProps("nume")} />
@@ -182,14 +192,14 @@ export default function CallbackForm({ twoColumns = false }: { twoColumns?: bool
         <FieldError id={errId("telefon")} message={touched.telefon ? errors.telefon : undefined} />
       </label>
       <label className="flex flex-col gap-1.5">
-        <span className="font-semibold text-on-surface">
+        <span className={`font-semibold text-on-surface ${pairLabel}`}>
           {t("Email pentru corespondență")} <span className="font-normal text-on-surface-variant">{t("(opțional)")}</span>
         </span>
         <input className={inputClass} name="email" type="email" placeholder={t("Ex.: nume@exemplu.ro")} autoComplete="email" {...fieldProps("email")} />
         <FieldError id={errId("email")} message={touched.email ? errors.email : undefined} />
       </label>
       <label className="flex flex-col gap-1.5">
-        <span className="font-semibold text-on-surface">{t("Pentru ce ai nevoie de consultație?")}</span>
+        <span className={`font-semibold text-on-surface ${pairLabel}`}>{t("Pentru ce ai nevoie de consultație?")}</span>
         {/* Săgeata nativă a browserului e ascunsă (appearance-none); în locul ei, o săgeată din setul de iconițe al site-ului. */}
         <span className="relative block">
         <select className={`${inputClass} cursor-pointer appearance-none pr-12`} name="motiv" required defaultValue="" {...fieldProps("motiv")}>
@@ -205,7 +215,7 @@ export default function CallbackForm({ twoColumns = false }: { twoColumns?: bool
         </span>
         <FieldError id={errId("motiv")} message={touched.motiv ? errors.motiv : undefined} />
       </label>
-      <label className="flex flex-col gap-1.5">
+      <label className={`flex flex-col gap-1.5 ${compact ? "sm:col-span-2" : ""}`}>
         <span className="font-semibold text-on-surface">
           {t("Zi sau interval preferat")} <span className="font-normal text-on-surface-variant">{t("(opțional)")}</span>
         </span>
@@ -214,11 +224,11 @@ export default function CallbackForm({ twoColumns = false }: { twoColumns?: bool
       </label>
       </div>
       <div className="flex min-w-0 flex-col gap-4">
-      <SymptomPicker showOtherField={false} />
+      <SymptomPicker showOtherField={false} chips={compact} />
       {selected.includes("altceva") && <OtherConcernField name="mesaj" />}
       </div>
       </div>
-      <div className="flex flex-col items-start gap-4 border-t border-outline-variant/40 pt-6">
+      <div className={`flex flex-col items-start gap-4 border-t border-outline-variant/40 ${compact ? "pt-5" : "pt-6"}`}>
       <div className="flex flex-col gap-1.5 pt-1">
         <div className="flex items-start gap-3">
           <input id={consentId} type="checkbox" name="gdpr" required className="mt-1 h-4 w-4 shrink-0 accent-primary" {...fieldProps("gdpr")} />
@@ -233,7 +243,7 @@ export default function CallbackForm({ twoColumns = false }: { twoColumns?: bool
         type="submit"
         disabled={status === "sending"}
         aria-busy={status === "sending"}
-        className="mt-2 w-full rounded-full bg-primary px-10 py-3 font-semibold text-white shadow-md transition-colors hover:bg-primary-container disabled:cursor-wait disabled:opacity-70 sm:w-auto sm:self-start"
+        className={`w-full rounded-full bg-primary px-10 py-3 font-semibold text-white shadow-md transition-colors hover:bg-primary-container disabled:cursor-wait disabled:opacity-70 ${compact ? "" : "mt-2 sm:w-auto sm:self-start"}`}
       >
         {status === "sending" ? t("Se trimite…") : t("Sună-mă")}</button>
       {(status === "error" || status === "unconfigured") && (

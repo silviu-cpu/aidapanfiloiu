@@ -60,6 +60,8 @@ const tmp = {
   lookEnd: new THREE.Vector3(),
   fit: new THREE.Matrix4(),
   heroPos: new THREE.Vector3(),
+  /** Progresul de la cadrul trecut; -1 forțează recalcularea umbrelor. */
+  lastP: -1,
 };
 
 /** Cât de înaltă apare pensa în hero, raportat la scara ei (unități de lume, cu tot cu înclinare). */
@@ -81,7 +83,7 @@ const FIT_GAP_TOP = 0.05;
 const FIT_GAP_BOTTOM = 0.06;
 const FIT_MIN_SCALE = 0.55;
 
-export function Scene({ store }: { store: RefObject<HeroStore> }) {
+export function Scene({ store, shadowSize }: { store: RefObject<HeroStore>; shadowSize: number }) {
   const scene = useThree((s) => s.scene);
   const width = useThree((s) => s.size.width);
   const height = useThree((s) => s.size.height);
@@ -135,6 +137,11 @@ export function Scene({ store }: { store: RefObject<HeroStore> }) {
       scene.remove(light.target);
     };
   }, [scene]);
+
+  // La pornire și când se rotește ecranul (tava se așază altfel), umbrele se refac.
+  useEffect(() => {
+    tmp.lastP = -1;
+  }, [portrait, shadowSize]);
 
   useFrame((state, dt) => {
     const a = anchor.current;
@@ -252,6 +259,12 @@ export function Scene({ store }: { store: RefObject<HeroStore> }) {
       camera.projectionMatrix.premultiply(tmp.fit);
       camera.projectionMatrixInverse.copy(camera.projectionMatrix).invert();
     }
+
+    // Umbrele sunt o parte scumpă a scenei. Le recalculăm doar cât instrumentele
+    // se mișcă deasupra tăvii; în hero și după aterizare rămân cele deja calculate.
+    const nearTray = Math.max(p, tmp.lastP) > 0.1 && Math.min(p, tmp.lastP) < 0.86;
+    if (tmp.lastP < 0 || (p !== tmp.lastP && nearTray)) state.gl.shadowMap.needsUpdate = true;
+    tmp.lastP = p;
   });
 
   return (
@@ -263,8 +276,8 @@ export function Scene({ store }: { store: RefObject<HeroStore> }) {
         position={[TRAY_POSITION.x + 2.5, TRAY_POSITION.y + 8, TRAY_POSITION.z + 3.5]}
         intensity={1.4}
         castShadow
-        // Pe telefon (ecran vertical), umbra la rezoluție mai mică: arată la fel, costă de 4 ori mai puțin.
-        shadow-mapSize={portrait ? [1024, 1024] : [2048, 2048]}
+        // Pe telefon, umbra are rezoluție mai mică: arată la fel, costă de 4 ori mai puțin.
+        shadow-mapSize={[shadowSize, shadowSize]}
         shadow-camera-left={-4.5}
         shadow-camera-right={4.5}
         shadow-camera-top={4.5}

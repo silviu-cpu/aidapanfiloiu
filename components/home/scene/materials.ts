@@ -15,7 +15,11 @@ export const mats = {
   /** Tava de inox. */
   tray: new THREE.MeshStandardMaterial({ color: "#b4bdc0", metalness: 1, roughness: 0.36 }),
   /** Inserția din silicon în care stau instrumentele. */
-  foam: new THREE.MeshStandardMaterial({ color: "#21474b", metalness: 0, roughness: 0.88 }),
+  /*
+   * Inserția acoperă cea mai mare parte din ecran când se vede tava, deci folosește
+   * un material mat simplu (Lambert): arată la fel, dar e mult mai ușor pentru telefoane.
+   */
+  foam: new THREE.MeshLambertMaterial({ color: "#324e51" }),
   /** Fundul locașurilor, puțin mai închis. */
-  foamDeep: new THREE.MeshStandardMaterial({ color: "#132e31", metalness: 0, roughness: 0.95 }),
+  foamDeep: new THREE.MeshLambertMaterial({ color: "#1f3236" }),
 };

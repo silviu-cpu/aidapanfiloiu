@@ -13,7 +13,7 @@ export function SiteHeader({ lang, current }: { lang: Locale; current: string })
     <header className="pointer-events-none fixed inset-x-0 top-4 z-50 px-4">
       <nav
         aria-label={t.label}
-        className="pointer-events-auto relative mx-auto flex max-w-3xl items-center justify-between gap-2 rounded-full border border-white/15 bg-[#0f2629]/60 py-2 pl-3 pr-2 text-white shadow-xl shadow-black/20 backdrop-blur-xl sm:gap-4 sm:pl-5"
+        className="pointer-events-auto relative mx-auto flex max-w-3xl items-center justify-between gap-2 rounded-full border border-white/15 bg-[#0f2629]/90 py-2 pl-3 pr-2 text-white shadow-xl shadow-black/20 sm:gap-4 sm:pl-5 md:bg-[#0f2629]/60 md:backdrop-blur-xl"
       >
         <Link href={localePath(lang, "/")} className="flex items-center gap-2 text-xs font-semibold sm:text-sm">
           <Image src="/brand/logo.svg" width={32} height={32} alt="" aria-hidden="true" className="size-6 shrink-0 sm:size-8" />

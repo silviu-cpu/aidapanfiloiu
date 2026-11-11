@@ -47,7 +47,16 @@ export function OtherConcernField({ name = "alte_detalii" }: { name?: string } =
   );
 }
 
-export default function SymptomPicker({ dark = false, showOtherField = true }: { dark?: boolean; showOtherField?: boolean }) {
+/** `chips`: variantele apar ca etichete pe un rând, în loc de listă cu bife (ocupă mai puțin pe înălțime). */
+export default function SymptomPicker({
+  dark = false,
+  showOtherField = true,
+  chips = false,
+}: {
+  dark?: boolean;
+  showOtherField?: boolean;
+  chips?: boolean;
+}) {
   const { t } = useTranslation();
   const { selected, toggle } = useSymptoms();
   const id = useId();
@@ -59,6 +68,25 @@ export default function SymptomPicker({ dark = false, showOtherField = true }: {
       <p id={`${id}-hint`} className={`mb-3 text-sm leading-relaxed ${dark ? "text-white/75" : "text-on-surface-variant"}`}>
         {t("Poți bifa mai multe variante sau poți descrie situația în propriile cuvinte mai jos.")}
       </p>
+      {chips ? (
+        <div className="flex flex-wrap gap-2">
+          {symptoms.map((symptom) => (
+            <label key={symptom.id} className="cursor-pointer">
+              <input
+                type="checkbox"
+                name="simptome"
+                value={symptom.id}
+                checked={selected.includes(symptom.id)}
+                onChange={() => toggle(symptom.id)}
+                className="peer sr-only"
+              />
+              <span className="inline-flex min-h-10 items-center rounded-full border border-outline-variant/60 bg-surface-lowest px-4 py-2 text-sm font-medium text-on-surface transition-colors hover:border-primary/60 peer-checked:border-primary peer-checked:bg-primary peer-checked:text-white peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-primary">
+                {t(symptom.label)}
+              </span>
+            </label>
+          ))}
+        </div>
+      ) : (
       <div className={`grid gap-x-8 ${dark ? "sm:grid-cols-2" : "grid-cols-1"}`}>
         {symptoms.map((symptom) => (
           <label
@@ -77,6 +105,7 @@ export default function SymptomPicker({ dark = false, showOtherField = true }: {
           </label>
         ))}
       </div>
+      )}
       {showOtherField && selected.includes("altceva") && <OtherConcernField />}
     </fieldset>
   );

@@ -102,9 +102,6 @@ export function Tray({
     const insert = extrudeCentered(insertShape, insertDepth, 0.012, 24);
     insert.translate(0, 0, (FLOOR_Z + INSERT_TOP) / 2);
 
-    const base = extrudeCentered(roundedRect(OUTER.w, OUTER.h, OUTER.r) as THREE.Shape, 0.08, 0.02);
-    base.translate(0, 0, (BASE_BOTTOM + FLOOR_Z) / 2);
-
     const rimShape = roundedRect(OUTER.w, OUTER.h, OUTER.r) as THREE.Shape;
     rimShape.holes = [roundedRect(INNER.w, INNER.h, INNER.r, new THREE.Path())];
     const rim = extrudeCentered(rimShape, RIM_TOP - BASE_BOTTOM - 0.05, 0.025, 24);
@@ -120,7 +117,7 @@ export function Tray({
       return pts;
     });
 
-    return { insert, base, rim, floor, glow: outlines[0], outlines };
+    return { insert, rim, floor, glow: outlines[0], outlines };
   }, []);
 
   useFrame(() => {
@@ -151,9 +148,9 @@ export function Tray({
 
   return (
     <group position={TRAY_POSITION} rotation={[-Math.PI / 2, 0, portrait ? Math.PI / 2 : 0]}>
-      <mesh geometry={geo.base} material={mats.tray} receiveShadow />
       <mesh geometry={geo.rim} material={mats.tray} castShadow receiveShadow />
-      <mesh geometry={geo.floor} material={mats.foamDeep} receiveShadow />
+      {/* Fundul se desenează după inserție: partea acoperită de ea e sărită de placa video. */}
+      <mesh geometry={geo.floor} material={mats.foamDeep} receiveShadow renderOrder={1} />
       <mesh geometry={geo.insert} material={mats.foam} castShadow receiveShadow />
 
       <Line
