@@ -462,5 +462,6 @@
   "Numărul de telefon nu este valid. Exemplu: 0712 345 678.": "This phone number is not valid. Please include your country code, e.g. +44 7911 123456 (or 0712 345 678 for Romanian numbers).",
   "Adresa de email nu este validă. Exemplu: nume@exemplu.ro.": "This email address is not valid. Example: name@example.com.",
   "Alege tipul consultației.": "Please choose the type of consultation.",
-  "Ca să te pot suna, e nevoie de acordul tău pentru prelucrarea datelor.": "I need your consent to process your data before I can call you."
+  "Ca să te pot suna, e nevoie de acordul tău pentru prelucrarea datelor.": "I need your consent to process your data before I can call you.",
+  "Se încarcă harta…": "Loading map…"
 }

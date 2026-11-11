@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Info } from "lucide-react";
 import { useTranslation } from "@/components/LocaleProvider";
 import { locations, surgeryNote } from "@/lib/content";
@@ -10,13 +10,23 @@ export default function LocationsMap() {
   const [selectedId, setSelectedId] = useState(locations[0].id);
   const selected = locations.find((location) => location.id === selectedId) ?? locations[0];
   const query = encodeURIComponent(selected.mapQuery);
+  // Harta clinicii alese e încărcată? Până atunci, peste hartă stă un mic loader.
+  const [loadedId, setLoadedId] = useState<string | null>(null);
+  const loading = loadedId !== selected.id;
+
+  // Plasă de siguranță: dacă Google Maps nu anunță încărcarea, loader-ul pleacă oricum după 8 secunde.
+  useEffect(() => {
+    const id = window.setTimeout(() => setLoadedId(selected.id), 8000);
+    return () => window.clearTimeout(id);
+  }, [selected.id]);
 
   return (
     <div className="grid grid-cols-1 items-start gap-10 lg:grid-cols-12">
       <div className="flex flex-col rounded-[2rem] bg-surface-low p-6 lg:sticky lg:top-24 lg:col-span-6">
-        <div id="clinic-map" className="aspect-[4/3] w-full overflow-hidden rounded-2xl bg-surface-lowest">
+        <div id="clinic-map" aria-busy={loading} className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl bg-surface-lowest">
           <iframe
             key={selected.id}
+            onLoad={() => setLoadedId(selected.id)}
             src={`https://www.google.com/maps?q=${query}&output=embed&hl=${lang}`}
             title={`${t("Hartă Google Maps pentru")} ${t(selected.name)}`}
             className="h-full w-full border-0"
@@ -24,6 +34,18 @@ export default function LocationsMap() {
             allowFullScreen
             referrerPolicy="no-referrer-when-downgrade"
           />
+          {/* Loader-ul hărții: apare când schimbi clinica și se stinge când harta s-a încărcat. */}
+          <div
+            className={`pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-3 bg-surface-low/85 backdrop-blur-sm transition-opacity duration-300 ${
+              loading ? "opacity-100" : "opacity-0"
+            }`}
+          >
+            <span
+              aria-hidden="true"
+              className="size-9 animate-spin rounded-full border-[3px] border-primary/15 border-t-primary motion-reduce:animate-none"
+            />
+            <span className="text-sm font-medium text-primary">{loading ? t("Se încarcă harta…") : ""}</span>
+          </div>
         </div>
         <div className="mt-4" aria-live="polite" aria-atomic="true">
           <p className="text-sm font-semibold text-primary">{t(selected.name)}</p>
