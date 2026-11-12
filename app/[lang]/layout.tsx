@@ -7,6 +7,7 @@ import { notFound } from "next/navigation";
 import { common, hasLocale, locales, ogLocale } from "@/lib/i18n";
 import { site } from "@/lib/site";
 import { AppointmentProvider } from "@/components/site/AppointmentModal";
+import { ScrollToTop } from "@/components/ScrollToTop";
 import "../globals.css";
 
 const jakarta = Plus_Jakarta_Sans({
@@ -68,6 +69,7 @@ export default async function RootLayout({ children, params }: LayoutProps<"/[la
         >
           {t.skip}
         </a>
+        <ScrollToTop />
         <main id="continut" className="w-full flex-1">
           <LocaleProvider lang={lang}>
             <SymptomProvider>

@@ -96,10 +96,6 @@ export function AppointmentProvider({ children }: { children: ReactNode }) {
                   </li>
                 ))}
               </ul>
-
-              <p className="mt-6 hidden border-t border-white/15 pt-5 text-xs leading-relaxed text-white/60 md:block">
-                {t("Răspund în română, engleză și spaniolă.")}
-              </p>
             </div>
           </aside>
 

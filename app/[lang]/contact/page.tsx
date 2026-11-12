@@ -1,4 +1,4 @@
-import { translator } from "@/lib/translate";
+import { translator } from "@/lib/translate";
 import { ScrollReveal } from "@/components/ScrollReveal";
 import type { Metadata } from "next";
 import { SiteHeader } from "@/components/SiteHeader";
@@ -92,7 +92,6 @@ export default async function ContactPage({ params }: PageProps<"/[lang]/contact
               </div>
             ))}
           </div>
-          <p className="pt-8 text-center text-secondary">{t(contact.languages)}</p>
         </div>
       </section>
 

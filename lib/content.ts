@@ -20,7 +20,6 @@ export const contact = {
   whatsappDisplay: "+40 746 051 990",
   whatsappHref: "https://wa.me/40746051990",
   email: "aida.panfiloiu@yahoo.com",
-  languages: "Răspund în română, engleză și spaniolă.",
 };
 
 export const nav = [
