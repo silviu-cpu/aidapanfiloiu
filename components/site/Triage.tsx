@@ -5,10 +5,22 @@ import Photo from "@/components/site/Photo";
 import { MessageCircle, Phone } from "lucide-react";
 import { contact, images, triage } from "@/lib/content";
 import { symptoms } from "@/lib/symptoms";
-import { OtherConcernField, useSymptoms } from "./SymptomPicker";
+import { SymptomProvider, useSymptoms } from "./SymptomPicker";
 
-/** Original category buttons and card, with independently selectable options. */
+/**
+ * Butoanele cu probleme și cardul de contact de sus de pe pagina Contact.
+ * Au propria selecție, separată de formularele de programare (care rămân legate între ele):
+ * ce alegi aici se folosește doar în mesajul precompletat de WhatsApp.
+ */
 export default function Triage() {
+  return (
+    <SymptomProvider>
+      <TriageContent />
+    </SymptomProvider>
+  );
+}
+
+function TriageContent() {
   const { t } = useTranslation();
   const { selected, toggle, otherDetails } = useSymptoms();
   const options = triage.filter((entry) => selected.some((id) => id === entry.id));
@@ -47,27 +59,9 @@ export default function Triage() {
           <div className="absolute inset-0 bg-gradient-to-t from-primary/80 via-transparent to-transparent" />
         </div>
         <div className="flex flex-col justify-between gap-6 p-6 md:col-span-7 md:p-10">
-          <div>
-            {options.length ? (
-              <>
-                <h2 className="mb-5 font-heading text-2xl leading-tight text-primary">{t("Despre ce vrei să discutăm")}</h2>
-                <div className="divide-y divide-outline-variant/40">
-                  {options.map((option) => (
-                    <div key={option.id} className="py-4 first:pt-0 last:pb-0">
-                      <h3 className="mb-1.5 font-sans text-[15px] font-semibold text-primary">{t(option.label)}</h3>
-                      <p className="text-sm leading-relaxed text-on-surface-variant">{t(option.description)}</p>
-                      {option.id === "altceva" && <OtherConcernField />}
-                    </div>
-                  ))}
-                </div>
-                <p className="mt-6 border-t border-outline-variant/40 pt-5 text-sm leading-relaxed text-on-surface-variant">
-                  {t("Spune-mi de când au apărut simptomele, când se accentuează și ce investigații ai făcut.")}
-                </p>
-              </>
-            ) : (
-              <p className="leading-relaxed text-on-surface-variant">{t("Selectează una sau mai multe opțiuni de mai sus pentru a vedea ce putem discuta la consultație.")}</p>
-            )}
-          </div>
+          <p className="leading-relaxed text-on-surface-variant">
+            {t("Spune-mi de când au apărut simptomele, când se accentuează și ce investigații ai făcut.")}
+          </p>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <a href={contact.phoneHref} aria-label={t("Sună pentru programare")} className="inline-flex min-h-12 min-w-0 items-center justify-center rounded-full bg-primary-container px-4 py-3 text-sm font-semibold leading-5 text-white transition-colors hover:bg-primary">
               <span className="inline-flex items-center gap-2 whitespace-nowrap">
