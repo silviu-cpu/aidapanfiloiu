@@ -35,8 +35,21 @@ export function ScrollToTop() {
       return;
     }
     if (window.location.hash) return;
-    // „instant”: site-ul are scroll lin activat, iar aici nu vrem animația de la jos în sus.
-    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+
+    // Site-ul are scroll lin (CSS), iar aici nu vrem animația de la jos în sus. Unele browsere
+    // (Safari) îl aplică și peste „instant”, așa că îl oprim cât timp sărim sus.
+    const html = document.documentElement;
+    const toTop = () => {
+      const previous = html.style.scrollBehavior;
+      html.style.scrollBehavior = "auto";
+      window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+      html.style.scrollBehavior = previous;
+    };
+    toTop();
+    // Încă o dată în cadrul următor: dacă pagina nouă își termină încărcarea sau browserul
+    // mai are inerție de la derularea cu degetul, nu rămânem la jumătatea paginii.
+    const frame = requestAnimationFrame(toTop);
+    return () => cancelAnimationFrame(frame);
   }, [pathname]);
 
   return null;
