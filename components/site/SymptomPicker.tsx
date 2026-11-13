@@ -33,7 +33,10 @@ export function OtherConcernField({ name = "alte_detalii" }: { name?: string } =
   const { otherDetails, setOtherDetails } = useSymptoms();
   return (
     <label className="mt-3 flex flex-col gap-2">
-      <span className="text-sm font-medium text-primary">{t("Descrie ce te deranjează")} <span className="font-normal text-on-surface-variant">{t("(opțional)")}</span></span>
+      <span className="text-sm font-medium text-primary">{t("Spune-mi mai multe despre simptomele tale")} <span className="font-normal text-on-surface-variant">{t("(opțional)")}</span></span>
+      <span className="text-sm leading-relaxed text-on-surface-variant">
+        {t("Descrie pe scurt ce simptome ai, când au apărut, cum au evoluat și dacă ai efectuat investigații sau ai primit anterior un diagnostic. Aceste informații ne pot ajuta să pregătim mai bine consultația.")}
+      </span>
       <textarea
         name={name}
         value={otherDetails}

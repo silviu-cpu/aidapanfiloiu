@@ -1,10 +1,10 @@
 /** The same patient-selected topics are used in the category buttons and forms. */
 export const symptoms = [
-  { id: "hernie", label: "Hernie", group: "general" },
-  { id: "colecist", label: "Colecist", group: "general" },
-  { id: "procto", label: "Hemoroizi, fisuri, fistule", group: "proctology" },
-  { id: "plagi", label: "Plăgi", group: "wounds" },
-  { id: "altceva", label: "Altceva", group: "general" },
+  { id: "hernie", label: "Hernii abdominale și inghinale", group: "general" },
+  { id: "colecist", label: "Colecist și litiază biliară", group: "general" },
+  { id: "procto", label: "Hemoroizi, fisuri și fistule anale", group: "proctology" },
+  { id: "plagi", label: "Plăgi și probleme de vindecare", group: "wounds" },
+  { id: "altceva", label: "Alte afecțiuni sau simptome", group: "general" },
 ] as const;
 
 export type SymptomId = (typeof symptoms)[number]["id"];

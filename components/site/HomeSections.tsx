@@ -1,4 +1,5 @@
-import { translator } from "@/lib/translate";
+import { translator } from "@/lib/translate";
+
 import SectionFade from "@/components/site/SectionFade";
 import { localePath, type Locale } from "@/lib/i18n";
 import Link from "next/link";
@@ -27,36 +28,38 @@ import { ButtonLink, Faq } from "@/components/site/ui";
 import { doctor, images, surgeryNote, testimonials } from "@/lib/content";
 import TestimonialCarousel from "@/components/site/TestimonialCarousel";
 
-// Categoriile din Stitch, fără cifrele inventate (98%, 4.9 stele, 100%).
-// TODO: „10+ ani” (rezidențiat din 2016) de confirmat cu doamna doctor.
+// Textele din documentul primit de la doamna doctor (AidaPanfi.docx).
 const highlights = [
-  { value: "10+ ani", label: "Chirurgie generală", detail: "Abord minim invaziv și clasic" },
-  { value: "Laparoscopie", label: "Chirurgie minim invazivă", detail: "Tehnici chirurgicale de precizie" },
-  { value: "Proctologie", label: "Diagnostic atent", detail: "Tratament adaptat fiecărui caz" },
-  { value: "Plăgi", label: "Îngrijirea plăgilor", detail: "Pansamente moderne și monitorizare" },
+  { value: "10+ ani de experiență", label: "Chirurgie generală", detail: "Abordări chirurgicale clasice și minim invazive" },
+  { value: "Chirurgie laparoscopică și robotică", label: "Tehnici chirurgicale moderne", detail: "Intervenții asistate robotic în echipe multidisciplinare" },
+  { value: "Proctologie", label: "Evaluare și diagnostic", detail: "Tratament individualizat al afecțiunilor anorectale" },
+  { value: "Îngrijirea plăgilor", label: "Plăgi acute, cronice și postoperatorii", detail: "Pansamente și monitorizarea vindecării" },
 ];
 
 const steps = [
   {
     num: "01",
     icon: MessageCircle,
-    title: "Consultația și ascultarea",
-    text: "Discuție detaliată despre debutul simptomelor, intensitatea durerii și istoricul medical familial și personal, într-un mediu calm și confidențial.",
-    note: "Timp alocat fără grabă",
+    title: "Discuția inițială și istoricul medical",
+    text: ["Consultația începe cu o discuție despre simptome, momentul apariției acestora, evoluția lor și antecedentele medicale personale și familiale relevante. Fiecare informație contribuie la înțelegerea particularităților cazului."],
+    note: "Anamneză și evaluare individualizată",
   },
   {
     num: "02",
     icon: Microscope,
-    title: "Evaluarea clinică și imagistică",
-    text: "Examinare clinică atentă și analiza documentelor medicale preexistente (ecografii abdominale, analize uzuale, examinări CT/RMN sau colonoscopii).",
-    note: "Corelarea datelor imagistice",
+    title: "Examinarea clinică și analiza investigațiilor",
+    text: ["Examinarea clinică este completată, atunci când este necesar, de analiza investigațiilor existente, precum ecografii, analize de laborator, CT, RMN sau colonoscopii. În funcție de rezultatele evaluării, pot fi recomandate investigații suplimentare."],
+    note: "Corelarea datelor clinice și paraclinice",
   },
   {
     num: "03",
     icon: ClipboardCheck,
-    title: "Planul de tratament personalizat",
-    text: "Stabilirea diagnosticului chirurgical și prezentarea clară a opțiunilor: tratament conservator, manevre ambulatorii sau intervenție chirurgicală programată.",
-    note: "Decizie comună informată",
+    title: "Stabilirea conduitei terapeutice",
+    text: [
+      "Pe baza evaluării, sunt discutate diagnosticul sau suspiciunea diagnostică și opțiunile de tratament disponibile, de la monitorizare și tratament conservator până la proceduri ambulatorii sau intervenții chirurgicale, atunci când există indicație.",
+      "Pacientului îi sunt explicate beneficiile, riscurile și alternativele relevante, pentru a putea participa informat la decizia terapeutică.",
+    ],
+    note: "Decizie medicală individualizată și informată",
   },
 ];
 
@@ -64,38 +67,38 @@ const homeConditions = [
   {
     icon: Layers,
     title: "Hernii inghinale și ombilicale",
-    text: "Intervenții de regulă laparoscopice, cu plasă de întărire, pentru o recuperare mai rapidă.",
-    link: "Abord laparoscopic",
+    text: "Evaluarea și tratamentul herniilor peretelui abdominal, prin tehnici chirurgicale clasice sau minim invazive, în funcție de particularitățile fiecărui caz.",
+    link: "Chirurgia peretelui abdominal",
   },
   {
     icon: Droplets,
-    title: "Colecist și litiază biliară",
-    text: "Colecistectomie laparoscopică, cu incizii mici și internare de obicei scurtă.",
-    link: "Chirurgie minim invazivă",
+    title: "Litiază biliară și afecțiuni ale colecistului",
+    text: "Evaluarea afecțiunilor vezicii biliare și tratamentul chirurgical atunci când există indicație, inclusiv prin colecistectomie laparoscopică.",
+    link: "Chirurgie laparoscopică",
   },
   {
     icon: Activity,
     title: "Hemoroizi",
-    text: "Diagnostic discret și tratament adaptat stadiului, de la conservator la minim invaziv.",
+    text: "Diagnostic și tratament individualizat al bolii hemoroidale, de la măsuri conservatoare și proceduri ambulatorii până la intervenții chirurgicale, în funcție de severitate și simptomatologie.",
     link: "Proctologie",
   },
   {
     icon: HeartPulse,
     title: "Fisuri anale",
-    text: "Tratament inițial conservator și intervenție atunci când fisura nu se vindecă.",
-    link: "Tratament adaptat",
+    text: "Evaluarea și tratamentul fisurilor anale prin măsuri conservatoare, tratament medicamentos sau intervenție chirurgicală, în cazurile în care aceasta este indicată.",
+    link: "Tratament individualizat",
   },
   {
     icon: GitMerge,
-    title: "Fistule perianale și pilonidale",
-    text: "Intervenții chirurgicale adaptate fiecărui caz, cu urmărire până la vindecare.",
-    link: "Evaluare clinică",
+    title: "Fistule perianale și boală pilonidală",
+    text: "Diagnostic și tratament chirurgical adaptat localizării și complexității afecțiunii, cu monitorizarea evoluției postoperatorii.",
+    link: "Chirurgie proctologică",
   },
   {
     icon: Bandage,
-    title: "Plăgi de orice tip",
-    text: "Curățare, pansamente moderne și monitorizare atentă a vindecării.",
-    link: "Tratamentul plăgilor",
+    title: "Plăgi acute, cronice și postoperatorii",
+    text: "Evaluarea și tratamentul plăgilor, prin curățare, debridare atunci când este indicată, pansamente adaptate tipului de plagă și monitorizarea procesului de vindecare.",
+    link: "Îngrijirea și tratamentul plăgilor",
   },
 ];
 
@@ -141,8 +144,7 @@ const faq = [
   },
   {
     q: "Cum decurge recuperarea după operație?",
-    // TODO: duratele de confirmat cu doamna doctor.
-    a: "Datorită tehnicilor minim invazive, mobilizarea are loc de obicei la câteva ore după operație. Majoritatea pacienților sunt externați în 24 până la 48 de ore și își reiau activitățile ușoare în decurs de o săptămână.",
+    a: "Datorită tehnicilor minim invazive, mobilizarea are loc de obicei la câteva ore după operație. Durata spitalizării și recuperării variază în funcție de intervenție și evoluția postoperatorie.",
   },
 ];
 
@@ -157,7 +159,7 @@ export default function HomeSections({ lang }: { lang: Locale }) {
         <div className="container-x grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4">
           {highlights.map((h) => (
             <div key={h.value} className="flex flex-col rounded-3xl bg-surface-low/60 p-5">
-              <span className="font-heading text-3xl text-primary md:text-4xl">{t(h.value)}</span>
+              <span className="font-heading text-2xl leading-tight text-primary md:text-3xl">{t(h.value)}</span>
               <span className="mt-2 text-[15px] font-semibold text-on-surface">{t(h.label)}</span>
               <span className="mt-0.5 text-sm text-on-surface-variant">{t(h.detail)}</span>
             </div>
@@ -182,18 +184,20 @@ export default function HomeSections({ lang }: { lang: Locale }) {
           </div>
           <div className="flex flex-col gap-8 lg:col-span-8">
             <h2 className="text-3xl leading-tight text-on-surface md:text-[44px]">
-              {t("Un plan de tratament începe cu o evaluare atentă și o discuție clară.")}</h2>
+              {t("O îngrijire medicală corectă începe cu o evaluare atentă.")}</h2>
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
               <p className="leading-relaxed text-on-surface-variant">
-                {t("Sunt")}{" "}{t(doctor.name)}{t(", medic specialist chirurgie generală. Cred cu tărie că actul medical chirurgical nu se rezumă la sala de operație, ci începe prin ascultarea fără grabă a pacientului și înțelegerea fiecărui detaliu al suferinței sale.")}</p>
+                {t("Sunt Dr. Aida Gabriela Panfiloiu, medic specialist în chirurgie generală. Consider că actul medical nu se limitează la intervenția chirurgicală, ci începe cu o evaluare atentă, înțelegerea istoricului medical și o comunicare deschisă cu fiecare pacient.")}</p>
               <p className="leading-relaxed text-on-surface-variant">
-                {t("Practica mea pune accentul pe procedurile laparoscopice moderne, cu traumă tisulară minimă, recuperare rapidă și reintegrare ușoară în viața de zi cu zi. În proctologie și patologia parietală aleg întotdeauna abordarea optimă, ghidată de ghidurile europene actuale.")}</p>
+                {t("Activitatea mea include chirurgia generală, proctologia, evaluarea și tratamentul plăgilor, precum și abordările chirurgicale clasice și minim invazive. Practic chirurgia laparoscopică și particip la intervenții asistate robotic, în cadrul echipelor multidisciplinare, în care colaborarea dintre specialități este esențială pentru gestionarea cazurilor complexe.")}</p>
+              <p className="leading-relaxed text-on-surface-variant md:col-span-2">
+                {t("Fiecare recomandare terapeutică are la bază particularitățile pacientului, dovezile științifice actuale și alegerea unei conduite medicale adaptate diagnosticului.")}</p>
             </div>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
               {[
-                { icon: Ear, label: "Ascultare autentică" },
-                { icon: Stethoscope, label: "Minim invaziv" },
-                { icon: Eye, label: "Claritate decizională" },
+                { icon: Ear, label: "Evaluare individualizată" },
+                { icon: Stethoscope, label: "Chirurgie modernă" },
+                { icon: Eye, label: "Decizii medicale informate" },
               ].map(({ icon: Icon, label }) => (
                 <div key={label} className="flex items-center gap-3 rounded-3xl bg-surface-low p-4">
                   <Icon className="text-primary" size={22} />
@@ -216,7 +220,7 @@ export default function HomeSections({ lang }: { lang: Locale }) {
         <div className="container-x">
           <div className="mb-10 flex flex-col justify-between gap-4 md:flex-row md:items-end">
             <h2 className="text-3xl text-on-surface md:text-[44px]">
-              {t("Etapele clare ale consultației chirurgicale")}</h2>
+              {t("Cum decurge consultația chirurgicală?")}</h2>
           </div>
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
             {steps.map(({ num, icon: Icon, title, text, note }) => (
@@ -231,8 +235,12 @@ export default function HomeSections({ lang }: { lang: Locale }) {
                   </span>
                 </div>
                 <h3 className="mb-2 font-sans text-lg font-semibold text-on-surface">{t(title)}</h3>
-                <p className="leading-relaxed text-on-surface-variant">{t(text)}</p>
-                <div className="mt-6 flex items-center gap-2 text-sm font-semibold text-primary">
+                <div className="flex flex-col gap-3 leading-relaxed text-on-surface-variant">
+                  {text.map((paragraph) => (
+                    <p key={paragraph}>{t(paragraph)}</p>
+                  ))}
+                </div>
+                <div className="mt-auto flex items-center gap-2 pt-6 text-sm font-semibold text-primary">
                   <CircleCheck size={16} />
                   {t(note)}
                 </div>
@@ -246,7 +254,7 @@ export default function HomeSections({ lang }: { lang: Locale }) {
       <section className="overflow-hidden bg-gradient-to-b from-surface via-secondary-container to-deep-2 py-16 md:py-24">
         <div className="container-x">
           <div className="mx-auto mb-10 flex max-w-2xl flex-col items-center gap-3 text-center">
-            <h2 className="text-3xl text-primary md:text-[44px]">{t("Ghidul afecțiunilor chirurgicale")}</h2>
+            <h2 className="text-3xl text-primary md:text-[44px]">{t("Afecțiuni evaluate și tratate")}</h2>
           </div>
           <div className="mx-auto grid max-w-6xl grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {homeConditions.map(({ icon: Icon, title, text, link }) => (

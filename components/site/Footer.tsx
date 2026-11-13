@@ -29,7 +29,7 @@ export default function Footer({ lang }: { lang: Locale }) {
           <div className="flex flex-col gap-4 lg:col-span-4">
             <span className="text-lg font-semibold text-on-surface">{t(doctor.name)}</span>
             <p className="max-w-sm text-sm leading-relaxed text-on-surface-variant">
-              {t(doctor.title)}{t(". Diagnostic chirurgical minim invaziv, protocoale clinice moderne și recuperare optimizată la standarde europene.")}</p>
+              {t("Medic specialist în chirurgie generală, cu activitate în proctologie, chirurgia laparoscopică, tratamentul plăgilor și participare la intervenții chirurgicale asistate robotic în echipe multidisciplinare.")}</p>
             <ul className="flex flex-col gap-1 text-sm text-on-surface-variant">
               <li>
                 <a href={contact.phoneHref} className="hover:text-primary">

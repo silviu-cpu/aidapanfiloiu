@@ -1,4 +1,6 @@
-import { translator } from "@/lib/translate";
+import { translator } from "@/lib/translate";
+
+
 import { ScrollReveal } from "@/components/ScrollReveal";
 import type { Metadata } from "next";
 import { SiteHeader } from "@/components/SiteHeader";
@@ -6,13 +8,26 @@ import Footer from "@/components/site/Footer";
 import { alternates, getLang, localePath, type Locale } from "@/lib/i18n";
 import Photo from "@/components/site/Photo";
 import Link from "next/link";
-import { ArrowDown, ArrowRight } from "lucide-react";
+import { Activity, ArrowDown, ArrowRight, Bandage, Bot, Scan, Stethoscope } from "lucide-react";
 import ConditionsGallery from "@/components/site/ConditionsGallery";
 import HeroBackdrop, { heroSectionClass } from "@/components/site/HeroBackdrop";
 import InvestigationsFile from "@/components/site/InvestigationsFile";
 import ServicesTable from "@/components/site/ServicesTable";
 import { ButtonLink, SectionTitle } from "@/components/site/ui";
 import { contact, disclaimer, doctor, images, locations, surgeryNote } from "@/lib/content";
+
+// Serviciile principale, din documentul primit de la doamna doctor (AidaPanfi.docx).
+const mainServices = [
+  { icon: Stethoscope, name: "Chirurgie generală", text: "Evaluare și tratament chirurgical individualizat." },
+  { icon: Scan, name: "Chirurgie laparoscopică", text: "Abord minim invaziv pentru afecțiuni cu indicație chirurgicală." },
+  { icon: Bot, name: "Chirurgie robotică", text: "Participare la intervenții în echipe multidisciplinare." },
+  { icon: Activity, name: "Proctologie", text: "Diagnostic și tratament pentru afecțiuni anorectale." },
+  {
+    icon: Bandage,
+    name: "Îngrijirea plăgilor",
+    text: "Evaluarea și tratamentul plăgilor acute, cronice și postoperatorii, cu monitorizarea vindecării și recomandări adaptate fiecărui caz.",
+  },
+];
 
 const laparoscopyBenefits = [
   "Câteva incizii mici",
@@ -65,9 +80,11 @@ export default async function ServiciiPage({ params }: PageProps<"/[lang]/servic
         <HeroBackdrop glow />
         <div className="container-x relative grid min-h-[440px] grid-cols-1 items-center gap-10 lg:grid-cols-12">
           <div className="flex flex-col items-start gap-5 lg:col-span-7">
-            <h1 className="text-5xl text-white md:text-6xl">{t("Servicii")}</h1>
+            <h1 className="text-5xl text-white md:text-6xl">{t("Servicii medicale")}</h1>
             <p className="max-w-xl text-lg text-surface-high">
-              {t("Consultații, investigații și tratament chirurgical pentru afecțiunile abdominale, proctologice și plăgi, în București.")}</p>
+              {t("Consultații de chirurgie generală și proctologie, evaluarea și tratamentul afecțiunilor abdominale, ale peretelui abdominal și anorectale, precum și îngrijirea plăgilor acute, cronice și postoperatorii.")}</p>
+            <p className="max-w-xl text-base leading-relaxed text-surface-high/85">
+              {t("Abordări chirurgicale clasice și minim invazive, inclusiv laparoscopice, și participare la intervenții asistate robotic în cadrul echipelor multidisciplinare. Fiecare recomandare terapeutică este adaptată diagnosticului, particularităților pacientului și indicației medicale.")}</p>
             <div className="flex flex-wrap gap-3 pt-2">
               <ButtonLink href={localePath(lang, "/contact")} variant="light" appointment>
                 {t("Programează o consultație")}</ButtonLink>
@@ -90,6 +107,31 @@ export default async function ServiciiPage({ params }: PageProps<"/[lang]/servic
               <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-deep/40 via-transparent to-transparent" />
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* SERVICII PRINCIPALE */}
+      <section className="bg-gradient-to-b from-surface-lowest to-surface py-14 md:py-20">
+        <div className="container-x">
+          <div className="flex max-w-3xl flex-col gap-4">
+            <p className="text-xl leading-relaxed text-on-surface">
+              {t("De la evaluarea inițială până la tratamentul chirurgical și monitorizarea postoperatorie, fiecare etapă este adaptată particularităților pacientului.")}
+            </p>
+            <p className="leading-relaxed text-on-surface-variant">
+              {t("Activitatea chirurgicală include tehnici clasice și minim invazive, precum chirurgia laparoscopică și participarea la intervenții asistate robotic, în cadrul echipelor multidisciplinare.")}
+            </p>
+          </div>
+          <ul className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
+            {mainServices.map(({ icon: Icon, name, text }) => (
+              <li key={name} className="flex flex-col gap-3 rounded-3xl bg-surface-low/70 p-5">
+                <span className="flex size-10 items-center justify-center rounded-xl bg-secondary-container/70 text-primary">
+                  <Icon size={20} aria-hidden="true" />
+                </span>
+                <span className="font-semibold text-on-surface">{t(name)}</span>
+                <span className="text-sm leading-relaxed text-on-surface-variant">{t(text)}</span>
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
 
@@ -129,7 +171,7 @@ export default async function ServiciiPage({ params }: PageProps<"/[lang]/servic
           <div className="flex flex-col gap-6 lg:col-span-6">
             <SectionTitle
               title={t("Chirurgie clasică sau laparoscopie?")}
-              intro={t("Laparoscopia pune accent pe confort și pe o recuperare mai rapidă, cu aceeași eficiență a intervenției.")}
+              intro={t("Laparoscopia pune accent pe confort și pe o recuperare mai rapidă, cu rezultate care depind de indicație, tehnică și particularitățile cazului.")}
             />
             <div className="flex flex-col gap-3 rounded-[2rem] bg-surface p-6">
               <span className="text-lg font-semibold text-primary">{t("Avantajele laparoscopiei")}</span>

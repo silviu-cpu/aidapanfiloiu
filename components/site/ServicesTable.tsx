@@ -66,7 +66,7 @@ export default function ServicesTable() {
                 type="button"
                 onClick={() => setSelected(i)}
                 aria-pressed={active}
-                aria-label={item.name}
+                aria-label={t(item.name)}
                 className={`flex aspect-[4/5] min-w-0 flex-col justify-between rounded-2xl p-2 text-left transition-all sm:aspect-square sm:p-3 ${
                   active
                     ? "-translate-y-0.5 border-2 border-primary bg-[#e8f3ee] shadow-md ring-2 ring-primary/20"

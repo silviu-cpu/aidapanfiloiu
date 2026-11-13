@@ -1,4 +1,5 @@
-import { translator } from "@/lib/translate";
+import { translator } from "@/lib/translate";
+
 import { ScrollReveal } from "@/components/ScrollReveal";
 import type { Metadata } from "next";
 import { SiteHeader } from "@/components/SiteHeader";
@@ -58,9 +59,9 @@ export default async function ContactPage({ params }: PageProps<"/[lang]/contact
       <section className={`${heroSectionClass} px-6 pb-24 pt-36 md:pt-40`}>
         <HeroBackdrop />
         <div className="relative mx-auto flex max-w-6xl flex-col items-center">
-          <h1 className="mb-3 max-w-3xl text-center text-5xl text-white md:text-6xl">{t("Cu ce te pot ajuta?")}</h1>
-          <p className="mb-10 max-w-xl text-center text-lg text-secondary-fixed">
-            {t("Alege ce te deranjează. Poți selecta mai multe variante, iar la consultație discutăm fiecare problemă.")}</p>
+          <h1 className="mb-3 max-w-3xl text-center text-5xl text-white md:text-6xl">{t("Cum te pot ajuta?")}</h1>
+          <p className="mb-10 max-w-2xl text-center text-lg text-secondary-fixed">
+            {t("Selectează afecțiunea sau simptomele pentru care îți dorești o evaluare medicală. Poți alege mai multe variante, iar în cadrul consultației vom discuta istoricul medical, investigațiile efectuate și opțiunile de tratament.")}</p>
           <Triage />
         </div>
       </section>

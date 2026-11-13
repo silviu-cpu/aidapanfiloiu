@@ -96,7 +96,10 @@ export default function ExperienceTimeline({ items }: { items: ExperienceItem[] 
         <div className="relative mx-auto flex min-h-0 w-full max-w-4xl flex-1 flex-col">
           <div className="shrink-0 pb-10">
             <h2 id="experience-title" className="mb-3 text-4xl text-white md:text-5xl">{t("Experiență profesională")}</h2>
-            <p className="text-lg text-mist">{t("Parcursul meu, de la rezidențiat până azi.")}</p>
+            <p className="text-lg font-medium text-mist">{t("Formare continuă și experiență în chirurgie generală")}</p>
+            <p className="mt-2 max-w-3xl text-base leading-relaxed text-white/75">
+              {t("Parcursul meu profesional cuprinde activitate clinică și chirurgicală în unități medicale publice și private, alături de pregătire în tehnici chirurgicale avansate și colaborare în echipe multidisciplinare.")}
+            </p>
           </div>
           <div ref={viewportRef} className={pinned ? "min-h-0 flex-1 overflow-hidden px-2 pt-3" : "px-2 pt-3"}>
     <ol ref={listRef} className={`relative space-y-12 pb-3 ${pinned ? "will-change-transform" : ""}`}>

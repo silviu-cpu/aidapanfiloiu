@@ -25,8 +25,6 @@ export type HeroCopy = {
   doctorPhoto: string;
   /** Specialitățile, afișate sub descriere. */
   pills: [string, string, string];
-  /** Rândurile de sub nume de pe parafa din loader. */
-  stampLines: [string, string];
   scroll: string;
   s2Eyebrow: string;
   s2Title: string;
@@ -59,7 +57,7 @@ export function HomeHero({
 
   useEffect(() => {
     if (!loaded) return;
-    const id = window.setTimeout(() => setEntered(true), 750);
+    const id = window.setTimeout(() => setEntered(true), 600);
     return () => window.clearTimeout(id);
   }, [loaded]);
 
@@ -213,7 +211,8 @@ export function HomeHero({
         ready={canvasReady}
         reduced={reduced}
         label={copy.loading}
-        stamp={{ name: copy.doctorName, lines: copy.stampLines }}
+        name="Dr. Aida Panfiloiu"
+        note={copy.pills.join(" · ")}
         onDrawn={() => setDrawn(true)}
         onDone={() => {
           // Pensa începe să urce puțin după ce loader-ul pornește spre ieșire.
