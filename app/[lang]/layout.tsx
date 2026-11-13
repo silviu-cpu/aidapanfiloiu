@@ -6,6 +6,8 @@ import { Newsreader, Plus_Jakarta_Sans } from "next/font/google";
 import { notFound } from "next/navigation";
 import { common, hasLocale, locales, ogLocale } from "@/lib/i18n";
 import { site } from "@/lib/site";
+import { shareImage } from "@/lib/seo";
+import { structuredDataJson } from "@/lib/structured-data";
 import { AppointmentProvider } from "@/components/site/AppointmentModal";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import "../globals.css";
@@ -32,7 +34,7 @@ export async function generateMetadata({ params }: LayoutProps<"/[lang]">): Prom
   return {
     metadataBase: new URL(site.url),
     title: {
-      default: site.name,
+      default: `${site.name} | ${t.specialty}`,
       template: `%s | ${site.name}`,
     },
     description: t.description,
@@ -48,8 +50,15 @@ export async function generateMetadata({ params }: LayoutProps<"/[lang]">): Prom
       type: "website",
       locale: ogLocale[lang],
       siteName: site.name,
-      title: site.name,
+      title: `${site.name} | ${t.specialty}`,
       description: t.description,
+      images: [shareImage(lang)],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${site.name} | ${t.specialty}`,
+      description: t.description,
+      images: [shareImage(lang).url],
     },
   };
 }
@@ -70,6 +79,8 @@ export default async function RootLayout({ children, params }: LayoutProps<"/[la
           {t.skip}
         </a>
         <ScrollToTop />
+        {/* Date structurate (schema.org) pentru Google și asistenții AI: medic, servicii, locații, programare. */}
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: structuredDataJson(lang) }} />
         <main id="continut" className="w-full flex-1">
           <LocaleProvider lang={lang}>
             <SymptomProvider>

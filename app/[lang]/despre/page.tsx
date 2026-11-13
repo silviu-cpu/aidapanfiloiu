@@ -6,7 +6,8 @@ import type { Metadata } from "next";
 import { ExternalLink } from "lucide-react";
 import { SiteHeader } from "@/components/SiteHeader";
 import Footer from "@/components/site/Footer";
-import { alternates, getLang, localePath, type Locale } from "@/lib/i18n";
+import { getLang, localePath, type Locale } from "@/lib/i18n";
+import { pageMetadata } from "@/lib/seo";
 import Photo from "@/components/site/Photo";
 import ExperienceTimeline, { type ExperienceItem } from "@/components/site/ExperienceTimeline";
 import HeroBackdrop, { heroSectionClass } from "@/components/site/HeroBackdrop";
@@ -75,11 +76,12 @@ const conferences = [
 export async function generateMetadata({ params }: PageProps<"/[lang]/despre">): Promise<Metadata> {
   const lang = await getLang(params);
   const t = translator(lang);
-  return {
+  return pageMetadata({
+    lang,
+    path: "/despre",
     title: t("Despre mine"),
     description: t("Dr. Aida Gabriela Panfiloiu, medic specialist chirurgie generală în București. Experiență în chirurgia clasică, laparoscopică și robotică."),
-    alternates: alternates(lang, "/despre"),
-  };
+  });
 }
 
 export default async function DesprePage({ params }: PageProps<"/[lang]/despre">) {

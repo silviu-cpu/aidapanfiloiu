@@ -37,12 +37,15 @@ export const ogLocale: Record<Locale, string> = { ro: "ro_RO", en: "en_GB" };
 export const common = {
   ro: {
     tagline: "Chirurgie generală în București",
-    description: "Dr. Aida Panfiloiu, medic specialist chirurgie generală în București. Consultații de chirurgie generală și proctologie, chirurgie laparoscopică și îngrijirea plăgilor.",
+    /** Specializarea, afișată în titlul paginii (tab-ul din browser) lângă nume. */
+    specialty: "Medic specialist chirurgie generală",
+    description: "Dr. Aida Gabriela Panfiloiu, medic specialist chirurgie generală. Consultații de chirurgie generală și proctologie în București, abordări minim invazive, laparoscopice și robotice.",
     skip: "Sari la conținut",
   },
   en: {
     tagline: "General surgery in Bucharest",
-    description: "Dr. Aida Panfiloiu, specialist in general surgery in Bucharest. General surgery and proctology consultations, laparoscopic surgery and wound care.",
+    specialty: "Specialist in general surgery",
+    description: "Dr. Aida Gabriela Panfiloiu, specialist in general surgery. General surgery and proctology consultations in Bucharest, with minimally invasive laparoscopic and robotic approaches.",
     skip: "Skip to content",
   },
 } satisfies Record<Locale, Record<string, string>>;

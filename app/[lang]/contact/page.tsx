@@ -4,7 +4,8 @@ import { ScrollReveal } from "@/components/ScrollReveal";
 import type { Metadata } from "next";
 import { SiteHeader } from "@/components/SiteHeader";
 import Footer from "@/components/site/Footer";
-import { alternates, getLang } from "@/lib/i18n";
+import { getLang } from "@/lib/i18n";
+import { pageMetadata } from "@/lib/seo";
 import LocationsMap from "@/components/site/LocationsMap";
 import CallbackForm from "@/components/site/CallbackForm";
 import Triage from "@/components/site/Triage";
@@ -41,11 +42,12 @@ const faq = [
 export async function generateMetadata({ params }: PageProps<"/[lang]/contact">): Promise<Metadata> {
   const lang = await getLang(params);
   const t = translator(lang);
-  return {
+  return pageMetadata({
+    lang,
+    path: "/contact",
     title: t("Contact"),
     description: t("Programări la Dr. Aida Gabriela Panfiloiu: Clinica Victoria, MedLife Titan și Grivița, Royal Hospital și Clinica Dr. Plagă, București."),
-    alternates: alternates(lang, "/contact"),
-  };
+  });
 }
 
 export default async function ContactPage({ params }: PageProps<"/[lang]/contact">) {

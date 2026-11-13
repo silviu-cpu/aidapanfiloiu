@@ -5,7 +5,8 @@ import { ScrollReveal } from "@/components/ScrollReveal";
 import type { Metadata } from "next";
 import { SiteHeader } from "@/components/SiteHeader";
 import Footer from "@/components/site/Footer";
-import { alternates, getLang, localePath, type Locale } from "@/lib/i18n";
+import { getLang, localePath, type Locale } from "@/lib/i18n";
+import { pageMetadata } from "@/lib/seo";
 import Photo from "@/components/site/Photo";
 import Link from "next/link";
 import { Activity, ArrowDown, ArrowRight, Bandage, Bot, Scan, Stethoscope } from "lucide-react";
@@ -61,11 +62,12 @@ const emergencies = [
 export async function generateMetadata({ params }: PageProps<"/[lang]/servicii">): Promise<Metadata> {
   const lang = await getLang(params);
   const t = translator(lang);
-  return {
+  return pageMetadata({
+    lang,
+    path: "/servicii",
     title: t("Servicii"),
-    description: t("Consultații de chirurgie generală și proctologie, chirurgie laparoscopică, tratamentul plăgilor și urmărire postoperatorie în București."),
-    alternates: alternates(lang, "/servicii"),
-  };
+    description: t("Consultații de chirurgie generală și proctologie, chirurgie laparoscopică și clasică, proctologie chirurgicală și îngrijirea plăgilor acute, cronice și postoperatorii, în București."),
+  });
 }
 
 export default async function ServiciiPage({ params }: PageProps<"/[lang]/servicii">) {

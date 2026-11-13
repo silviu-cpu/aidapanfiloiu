@@ -5,7 +5,8 @@ import { HomeHero, type HeroCopy } from "@/components/home/HomeHero";
 import { SiteHeader } from "@/components/SiteHeader";
 import Footer from "@/components/site/Footer";
 import HomeSections from "@/components/site/HomeSections";
-import { alternates, getLang, localePath, type Locale } from "@/lib/i18n";
+import { common, getLang, localePath, type Locale } from "@/lib/i18n";
+import { pageMetadata } from "@/lib/seo";
 import { site } from "@/lib/site";
 
 const hero: Record<Locale, HeroCopy> = {
@@ -45,10 +46,13 @@ const hero: Record<Locale, HeroCopy> = {
 
 export async function generateMetadata({ params }: PageProps<"/[lang]">): Promise<Metadata> {
   const lang = await getLang(params);
-  return {
-    title: { absolute: site.name },
-    alternates: alternates(lang, "/"),
-  };
+  return pageMetadata({
+    lang,
+    path: "/",
+    title: `${site.name} | ${common[lang].specialty}`,
+    description: common[lang].description,
+    absoluteTitle: true,
+  });
 }
 
 export default async function Home({ params }: PageProps<"/[lang]">) {
